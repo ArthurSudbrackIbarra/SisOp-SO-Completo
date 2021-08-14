@@ -4,8 +4,6 @@
 //
 // Fase 1 - máquina virtual (vide enunciado correspondente)
 //
-
-import java.util.*;
 public class Sistema {
 	
 	// -------------------------------------------------------------------------------------------------------
@@ -56,11 +54,11 @@ public class Sistema {
 		}
 	
         public void showState(){
-			 System.out.println("       "+ pc); 
-			   System.out.print("           ");
-			 for (int i=0; i<8; i++) { System.out.print("r"+i);   System.out.print(": "+reg[i]+"     "); };  
-			 System.out.println("");
-			 System.out.print("           ");  aux.dump(ir);
+			System.out.println("       "+ pc); 
+			System.out.print("           ");
+			for (int i=0; i<8; i++) { System.out.print("r"+i);   System.out.print(": "+reg[i]+"     "); };  
+			System.out.println("");
+			System.out.print("           ");  aux.dump(ir);
 		}
 
 		public void run() { 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
@@ -68,58 +66,83 @@ public class Sistema {
 				// FETCH
 					ir = m[pc]; 	// busca posicao da memoria apontada por pc, guarda em ir
 					//if debug
-					    showState();
+					showState();
 				// EXECUTA INSTRUCAO NO ir
 					switch (ir.opc) { // para cada opcode, sua execução
-
 						case LDI: // Rd ← k
 							reg[ir.r1] = ir.p;
 							pc++;
-							break;
+						break;
+
+						case LDD:
+							reg[ir.r1] = m[ir.p].p;
+							pc++;
+						break;
+
+						case LDX:
+							reg[ir.r1] = m[ir.r2].p;
+						break;
 
 						case STD: // [A] ← Rs
-							    m[ir.p].opc = Opcode.DATA;
-							    m[ir.p].p = reg[ir.r1];
-							    pc++;
+							m[ir.p].opc = Opcode.DATA;
+							m[ir.p].p = reg[ir.r1];
+							pc++;
 						break;
 
 						case ADD: // Rd ← Rd + Rs
 							reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
 							pc++;
-							break;
+						break;
 
 						case MULT: // Rd ← Rd * Rs
 							reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
 							pc++;
-							break;
+						break;
 
 						case ADDI: // Rd ← Rd + k
 							reg[ir.r1] = reg[ir.r1] + ir.p;
 							pc++;
-							break;
+						break;
 
 						case STX: // [Rd] ←Rs
-							    m[reg[ir.r1]].opc = Opcode.DATA;      
-							    m[reg[ir.r1]].p = reg[ir.r2];          
-								pc++;
-							break;
+							m[reg[ir.r1]].opc = Opcode.DATA;      
+							m[reg[ir.r1]].p = reg[ir.r2];          
+							pc++;
+						break;
 
 						case SUB: // Rd ← Rd - Rs
 							reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
 							pc++;
-							break;
+						break;
+
+						case SUBI:
+							reg[ir.r1] = reg[ir.r1] - ir.p;
+							pc++;
+						break;
 
 						case JMP: //  PC ← k
-								pc = ir.p;
-						     break;
-						
+							pc = ir.p;
+						break;	
+
+						case JMPI:
+							pc = reg[ir.r1];
+						break;
+
 						case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
 							if (reg[ir.r2] > 0) {
 								pc = reg[ir.r1];
 							} else {
 								pc++;
+							}	
+						break;
+
+						case JMPIL:
+							if(reg[ir.r2] < 0) {
+								pc = reg[ir.r1];
+							} else {
+								pc++;
 							}
-							break;
+						break;
 
 						case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
 							if (reg[ir.r2] == 0) {
@@ -127,10 +150,47 @@ public class Sistema {
 							} else {
 								pc++;
 							}
-							break;
+						break;
+
+						case JMPIM:
+							pc = m[ir.p].p;
+						break;
+
+						case JMPILM:
+							if(reg[ir.r2] < 0) {
+								pc = m[ir.p].p;
+							} else {
+								pc++;
+							}
+						break;
+
+						case JMPIGM:
+							if(reg[ir.r2] > 0) {
+								pc = m[ir.p].p;
+							} else {
+								pc++;
+							}
+						break;
+
+						case JMPIEM:
+							if(reg[ir.r2] == 0) {
+								pc = m[ir.p].p;
+							} else {
+								pc++;
+							}							
+						break;
+
+						case SWAP:
+							int t = reg[ir.r1];
+							reg[ir.r1] = reg[ir.r2];
+							reg[ir.r2] = t;
+						break;
 
 						case STOP: // por enquanto, para execucao
-							break;
+						break;
+
+						default:
+						break;
 					}
 				
 				// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
