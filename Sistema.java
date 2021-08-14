@@ -81,6 +81,7 @@ public class Sistema {
 
 						case LDX:
 							reg[ir.r1] = m[ir.r2].p;
+							pc++;
 						break;
 
 						case STD: // [A] ← Rs
@@ -184,6 +185,7 @@ public class Sistema {
 							int t = reg[ir.r1];
 							reg[ir.r1] = reg[ir.r2];
 							reg[ir.r2] = t;
+							pc++;
 						break;
 
 						case STOP: // por enquanto, para execucao
