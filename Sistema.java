@@ -376,7 +376,26 @@ public class Sistema {
 			new Word(Opcode.JMP, -1, -1, 4),     // 7   	vai p posicao 4
 			new Word(Opcode.STD, 1, -1, 10),     // 8   	coloca valor de r1 na posição 10
 			new Word(Opcode.STOP, -1, -1, -1),    // 9   	stop
-			new Word(Opcode.DATA, -1, -1, -1) };  // 10   ao final o valor do fatorial estará na posição 10 da memória                                    
+			new Word(Opcode.DATA, -1, -1, -1) };  // 10   ao final o valor do fatorial estará na posição 10 da memória   
+			
+
+		// PA, um programa que le um valor de uma determinada posição (carregada no inicio),
+		// se o número for menor que zero coloca -1 no início da posição de memória para saída;
+		// se for maior que zero este é o número de valores da sequencia de fibonacci a
+		// serem escritos em sequencia a partir de uma posição de memória;
+		public Word[] pa = new Word[] {};
+
+		// PB: dado um inteiro em alguma posição de memória,
+ 		// se for negativo armazena -1 na saída; se for positivo responde o fatorial do número na saída
+		public Word[] pb = new Word[] {};
+
+		// PC: para um N definido (10 por exemplo)
+		// o programa ordena um vetor de N números em alguma posição de memória;
+		// ordena usando bubble sort
+		// loop ate que não swap nada
+		// passando pelos N valores
+		// faz swap de vizinhos se da esquerda maior que da direita
+		public Word[] bubblesort = new Word[] {};
     }
 }
 
