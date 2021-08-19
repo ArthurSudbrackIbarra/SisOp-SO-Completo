@@ -39,6 +39,7 @@ public class Sistema {
 		private int pc; 			// ... composto de program counter,
 		private Word ir; 			// instruction register,
 		private int[] reg;       	// registradores da CPU
+		private int interruptor; // interruptor da CPU
 
 		private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
 			
