@@ -123,7 +123,7 @@ public class Sistema {
 								interruptFlag = 1;
 							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
 								interruptFlag = 1;
-							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2])){
+							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 								interruptFlag = 3;
 							} else {
 								reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
@@ -133,84 +133,153 @@ public class Sistema {
 						case MULT: // Rd ← Rd * Rs
 							if (ic.isInvalidAdressRegister(reg, ir.r1)){
 								interruptFlag = 1 ;
-							}else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
 								interruptFlag = 1;
+							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
+								interruptFlag = 3;
+							} else {
+								reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
 							}
-							reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
 							pc++;
 						break;
 						case ADDI: // Rd ← Rd + k
-							reg[ir.r1] = reg[ir.r1] + ir.p;
+							if(ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
+								interruptFlag = 3;
+							} else {
+								reg[ir.r1] = reg[ir.r1] + ir.p;
+							}
 							pc++;
 						break;
 						case STX: // [Rd] ←Rs
-							m[reg[ir.r1]].opc = Opcode.DATA;      
-							m[reg[ir.r1]].p = reg[ir.r2];          
+							if(ic.isInvalidAddress(m, ir.p)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1 ;
+							} else {
+								m[reg[ir.r1]].opc = Opcode.DATA;      
+								m[reg[ir.r1]].p = reg[ir.r2];          
+							}
 							pc++;
 						break;
 						case SUB: // Rd ← Rd - Rs
-							reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
+								interruptFlag = 3;
+							} else{							
+								reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
+							}
 							pc++;
 						break;
 						case SUBI:
-							reg[ir.r1] = reg[ir.r1] - ir.p;
+							if(ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
+								interruptFlag = 3;
+							} else {
+								reg[ir.r1] = reg[ir.r1] - ir.p;
+							}
 							pc++;
 						break;
 						case JMP: //  PC ← k
 							pc = ir.p;
 						break;	
 						case JMPI:
-							pc = reg[ir.r1];
+							if(ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else {
+								pc = reg[ir.r1];
+							}
 						break;
 						case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
-							if (reg[ir.r2] > 0) {
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (reg[ir.r2] > 0) {
 								pc = reg[ir.r1];
 							} else {
 								pc++;
 							}	
 						break;
 						case JMPIL:
-							if(reg[ir.r2] < 0) {
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if(reg[ir.r2] < 0) {
 								pc = reg[ir.r1];
 							} else {
 								pc++;
 							}
 						break;
 						case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
-							if (reg[ir.r2] == 0) {
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (reg[ir.r2] == 0) {
 								pc = reg[ir.r1];
 							} else {
 								pc++;
 							}
 						break;
 						case JMPIM:
-							pc = m[ir.p].p;
+							if(ic.isInvalidAddress(m, ir.p)){
+								interruptFlag = 1;
+							} else {
+								pc = m[ir.p].p;
+							}
 						break;
 						case JMPILM:
-							if(reg[ir.r2] < 0) {
+							if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAddress(m, ir.p)){
+								interruptFlag = 1;
+							} else if(reg[ir.r2] < 0) {
 								pc = m[ir.p].p;
 							} else {
 								pc++;
 							}
 						break;
 						case JMPIGM:
-							if(reg[ir.r2] > 0) {
+							if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAddress(m, ir.p)){
+								interruptFlag = 1;
+							} else if(reg[ir.r2] > 0) {
 								pc = m[ir.p].p;
 							} else {
 								pc++;
 							}
 						break;
 						case JMPIEM:
-							if(reg[ir.r2] == 0) {
+							if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAddress(m, ir.p)){
+								interruptFlag = 1;
+							} else if(reg[ir.r2] == 0) {
 								pc = m[ir.p].p;
 							} else {
 								pc++;
 							}							
 						break;
 						case SWAP:
-							int t = reg[ir.r1];
-							reg[ir.r1] = reg[ir.r2];
-							reg[ir.r2] = t;
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else{
+								int t = reg[ir.r1];
+								reg[ir.r1] = reg[ir.r2];
+								reg[ir.r2] = t;
+							}
 							pc++;
 						break;
 						case STOP: // por enquanto, para execucao
@@ -253,12 +322,24 @@ public class Sistema {
 			}
 		}
 
-		public boolean causesMathematicalOverflow(int a, int b){
-			long sum = (long) a + (long) b;
-			if(sum > Integer.MAX_VALUE) return true;
+		public boolean causesMathematicalOverflow(int a, int b, int operation){
+			long result;
+			switch (operation) {
+				case 1:
+					result = (long) a + (long) b;
+				break;
+				case 2:
+					result = (long) a - (long) b;
+				break;
+				case 3:
+					result = (long) a * (long) b;
+				break;
+				default:
+					return true;
+			}
+			if(result > Integer.MAX_VALUE) {return true;}
 			return false;
 		}
-
 	}
 	
     // ------------------- V M  - constituida de CPU e MEMORIA -----------------------------------------------
