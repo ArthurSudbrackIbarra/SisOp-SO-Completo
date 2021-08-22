@@ -85,7 +85,6 @@ public class Sistema {
 							}					
 							pc++;
 						break;
-
 						case LDD:
 							if(ic.isInvalidAdressRegister(reg, ir.r1)){
 								interruptFlag = 1;
@@ -96,7 +95,6 @@ public class Sistema {
 							}			
 							pc++;
 						break;
-
 						case LDX:
 							if(ic.isInvalidAdressRegister(reg, ir.r1)){
 								interruptFlag = 1;
@@ -107,52 +105,42 @@ public class Sistema {
 							}	
 							pc++;
 						break;
-
 						case STD: // [A] ← Rs
 							m[ir.p].opc = Opcode.DATA;
 							m[ir.p].p = reg[ir.r1];
 							pc++;
 						break;
-
 						case ADD: // Rd ← Rd + Rs
 							reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
 							pc++;
 						break;
-
 						case MULT: // Rd ← Rd * Rs
 							reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
 							pc++;
 						break;
-
 						case ADDI: // Rd ← Rd + k
 							reg[ir.r1] = reg[ir.r1] + ir.p;
 							pc++;
 						break;
-
 						case STX: // [Rd] ←Rs
 							m[reg[ir.r1]].opc = Opcode.DATA;      
 							m[reg[ir.r1]].p = reg[ir.r2];          
 							pc++;
 						break;
-
 						case SUB: // Rd ← Rd - Rs
 							reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
 							pc++;
 						break;
-
 						case SUBI:
 							reg[ir.r1] = reg[ir.r1] - ir.p;
 							pc++;
 						break;
-
 						case JMP: //  PC ← k
 							pc = ir.p;
 						break;	
-
 						case JMPI:
 							pc = reg[ir.r1];
 						break;
-
 						case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
 							if (reg[ir.r2] > 0) {
 								pc = reg[ir.r1];
@@ -160,7 +148,6 @@ public class Sistema {
 								pc++;
 							}	
 						break;
-
 						case JMPIL:
 							if(reg[ir.r2] < 0) {
 								pc = reg[ir.r1];
@@ -168,7 +155,6 @@ public class Sistema {
 								pc++;
 							}
 						break;
-
 						case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
 							if (reg[ir.r2] == 0) {
 								pc = reg[ir.r1];
@@ -176,11 +162,9 @@ public class Sistema {
 								pc++;
 							}
 						break;
-
 						case JMPIM:
 							pc = m[ir.p].p;
 						break;
-
 						case JMPILM:
 							if(reg[ir.r2] < 0) {
 								pc = m[ir.p].p;
@@ -188,7 +172,6 @@ public class Sistema {
 								pc++;
 							}
 						break;
-
 						case JMPIGM:
 							if(reg[ir.r2] > 0) {
 								pc = m[ir.p].p;
@@ -196,7 +179,6 @@ public class Sistema {
 								pc++;
 							}
 						break;
-
 						case JMPIEM:
 							if(reg[ir.r2] == 0) {
 								pc = m[ir.p].p;
@@ -204,17 +186,14 @@ public class Sistema {
 								pc++;
 							}							
 						break;
-
 						case SWAP:
 							int t = reg[ir.r1];
 							reg[ir.r1] = reg[ir.r2];
 							reg[ir.r2] = t;
 							pc++;
 						break;
-
 						case STOP: // por enquanto, para execucao
 						break;
-
 						default:
 						break;
 					}
