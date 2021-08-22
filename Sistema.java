@@ -43,8 +43,10 @@ public class Sistema {
 		private InterruptChecker ic;
 		// 0 - Tudo ok.
 		// 1 - Erro de enderecamento de memoria.
-		// 2 - Erro de instrucao invalida.
+		//*! 2 - Erro de instrucao invalida. switch case
 		// 3 - Erro de overflow em operacao matematica.
+		//*! 4 - Termino de programa. switch case
+
 		private int interruptFlag; // interruptor da CPU
 
 		private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
@@ -106,15 +108,34 @@ public class Sistema {
 							pc++;
 						break;
 						case STD: // [A] ← Rs
-							m[ir.p].opc = Opcode.DATA;
-							m[ir.p].p = reg[ir.r1];
+							if (ic.isInvalidAddress(m, ir.p)){ 
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else {
+								m[ir.p].opc = Opcode.DATA;
+								m[ir.p].p = reg[ir.r1];
+							}
 							pc++;
 						break;
 						case ADD: // Rd ← Rd + Rs
-							reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2])){
+								interruptFlag = 3;
+							} else {
+								reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
+							}
 							pc++;
 						break;
 						case MULT: // Rd ← Rd * Rs
+							if (ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1 ;
+							}else if (ic.isInvalidAdressRegister(reg, ir.r2)){
+								interruptFlag = 1;
+							}
 							reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
 							pc++;
 						break;
