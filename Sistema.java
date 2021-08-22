@@ -39,7 +39,13 @@ public class Sistema {
 		private int pc; 			// ... composto de program counter,
 		private Word ir; 			// instruction register,
 		private int[] reg;       	// registradores da CPU
-		private int interruptor; // interruptor da CPU
+
+		private InterruptChecker ic;
+		// 0 - Tudo ok.
+		// 1 - Erro de enderecamento de memoria.
+		// 2 - Erro de instrucao invalida.
+		// 3 - Erro de overflow em operacao matematica.
+		private int interruptFlag; // interruptor da CPU
 
 		private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
 			
@@ -48,6 +54,7 @@ public class Sistema {
 		public CPU(Word[] _m) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
 			m = _m; 				// usa o atributo 'm' para acessar a memoria.
 			reg = new int[8]; 		// aloca o espaço dos registradores
+			ic = new InterruptChecker();
 		}
 
 		public void setContext(int _pc) {  // no futuro esta funcao vai ter que ser 
@@ -71,17 +78,33 @@ public class Sistema {
 				// EXECUTA INSTRUCAO NO ir
 					switch (ir.opc) { // para cada opcode, sua execução
 						case LDI: // Rd ← k
-							reg[ir.r1] = ir.p;
+							if(ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else {
+								reg[ir.r1] = ir.p;
+							}					
 							pc++;
 						break;
 
 						case LDD:
-							reg[ir.r1] = m[ir.p].p;
+							if(ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAddress(m, ir.p)){
+								interruptFlag = 1;
+							} else {
+								reg[ir.r1] = m[ir.p].p;
+							}			
 							pc++;
 						break;
 
 						case LDX:
-							reg[ir.r1] = m[ir.r2].p;
+							if(ic.isInvalidAdressRegister(reg, ir.r1)){
+								interruptFlag = 1;
+							} else if (ic.isInvalidAddress(m, ir.r2)){
+								interruptFlag = 1;
+							} else {
+								reg[ir.r1] = m[ir.r2].p;
+							}	
 							pc++;
 						break;
 
@@ -200,15 +223,17 @@ public class Sistema {
 				if (ir.opc==Opcode.STOP) {   
 					break; // break sai do loop da cpu
 				}
+
+				interruptFlag = 0;
 			}
 		}
 	}
     // ------------------ C P U - fim ------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------
 
-	public class InterruptionChecker {
+	public class InterruptChecker {
 
-		public InterruptionChecker(){}
+		public InterruptChecker(){}
 
 		public boolean isInvalidAddress(Word[] m, int index){
 			try {
