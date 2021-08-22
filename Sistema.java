@@ -206,6 +206,35 @@ public class Sistema {
     // ------------------ C P U - fim ------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------
 
+	public class InterruptionChecker {
+
+		public InterruptionChecker(){}
+
+		public boolean isInvalidAddress(Word[] m, int index){
+			try {
+				Word instruction = m[index];
+				return false;
+			} catch (IndexOutOfBoundsException error) {
+				return true;
+			}
+		}
+
+		public boolean isInvalidAdressRegister(int[] reg, int index){
+			try {
+				int register = reg[index];
+				return false;
+			} catch (IndexOutOfBoundsException error) {
+				return true;
+			}
+		}
+
+		public boolean causesMathematicalOverflow(int a, int b){
+			long sum = (long) a + (long) b;
+			if(sum > Integer.MAX_VALUE) return true;
+			return false;
+		}
+
+	}
 	
     // ------------------- V M  - constituida de CPU e MEMORIA -----------------------------------------------
     // -------------------------- atributos e construcao da VM -----------------------------------------------
