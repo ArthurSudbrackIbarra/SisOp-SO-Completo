@@ -81,7 +81,7 @@ public class Sistema {
 				// EXECUTA INSTRUCAO NO ir
 					switch (ir.opc) { // para cada opcode, sua execução
 						case LDI: // Rd ← k
-							if(ic.isInvalidAddressRegister(reg, ir.r1)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else {
 								reg[ir.r1] = ir.p;
@@ -89,9 +89,9 @@ public class Sistema {
 							pc++;
 						break;
 						case LDD:
-							if(ic.isInvalidAddressRegister(reg, ir.r1)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddress(m, ir.p)){
+							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else {
 								reg[ir.r1] = m[ir.p].p;
@@ -99,9 +99,9 @@ public class Sistema {
 							pc++;
 						break;
 						case LDX:
-							if(ic.isInvalidAddressRegister(reg, ir.r1)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddress(m, ir.r2)){
+							} else if (ic.isInvalidAddress(ir.r2)){
 								interruptFlag = 1;
 							} else {
 								reg[ir.r1] = m[ir.r2].p;
@@ -109,9 +109,9 @@ public class Sistema {
 							pc++;
 						break;
 						case STD: // [A] ← Rs
-							if (ic.isInvalidAddress(m, ir.p)){ 
+							if (ic.isInvalidAddress(ir.p)){ 
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							} else if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else {
 								m[ir.p].opc = Opcode.DATA;
@@ -120,9 +120,9 @@ public class Sistema {
 							pc++;
 						break;
 						case ADD: // Rd ← Rd + Rs
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 								interruptFlag = 3;
@@ -132,9 +132,9 @@ public class Sistema {
 							pc++;
 						break;
 						case MULT: // Rd ← Rd * Rs
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1 ;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
 								interruptFlag = 3;
@@ -144,7 +144,7 @@ public class Sistema {
 							pc++;
 						break;
 						case ADDI: // Rd ← Rd + k
-							if(ic.isInvalidAddressRegister(reg, ir.r1)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
 								interruptFlag = 3;
@@ -154,11 +154,11 @@ public class Sistema {
 							pc++;
 						break;
 						case STX: // [Rd] ←Rs
-							if(ic.isInvalidAddress(m, ir.p)){
+							if(ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							} else if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1 ;
 							} else {
 								m[reg[ir.r1]].opc = Opcode.DATA;      
@@ -167,9 +167,9 @@ public class Sistema {
 							pc++;
 						break;
 						case SUB: // Rd ← Rd - Rs
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 								interruptFlag = 3;
@@ -179,7 +179,7 @@ public class Sistema {
 							pc++;
 						break;
 						case SUBI:
-							if(ic.isInvalidAddressRegister(reg, ir.r1)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
 								interruptFlag = 3;
@@ -192,16 +192,16 @@ public class Sistema {
 							pc = ir.p;
 						break;	
 						case JMPI:
-							if(ic.isInvalidAddressRegister(reg, ir.r1)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else {
 								pc = reg[ir.r1];
 							}
 						break;
 						case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (reg[ir.r2] > 0) {
 								pc = reg[ir.r1];
@@ -210,9 +210,9 @@ public class Sistema {
 							}	
 						break;
 						case JMPIL:
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] < 0) {
 								pc = reg[ir.r1];
@@ -221,9 +221,9 @@ public class Sistema {
 							}
 						break;
 						case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (reg[ir.r2] == 0) {
 								pc = reg[ir.r1];
@@ -232,16 +232,16 @@ public class Sistema {
 							}
 						break;
 						case JMPIM:
-							if(ic.isInvalidAddress(m, ir.p)){
+							if(ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else {
 								pc = m[ir.p].p;
 							}
 						break;
 						case JMPILM:
-							if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddress(m, ir.p)){
+							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] < 0) {
 								pc = m[ir.p].p;
@@ -250,9 +250,9 @@ public class Sistema {
 							}
 						break;
 						case JMPIGM:
-							if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddress(m, ir.p)){
+							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] > 0) {
 								pc = m[ir.p].p;
@@ -261,9 +261,9 @@ public class Sistema {
 							}
 						break;
 						case JMPIEM:
-							if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddress(m, ir.p)){
+							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] == 0) {
 								pc = m[ir.p].p;
@@ -272,9 +272,9 @@ public class Sistema {
 							}							
 						break;
 						case SWAP:
-							if (ic.isInvalidAddressRegister(reg, ir.r1)){
+							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddressRegister(reg, ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else {
 								int t = reg[ir.r1];
@@ -284,7 +284,7 @@ public class Sistema {
 							pc++;
 						break;
 						case TRAP:
-							if(ic.isInvalidAddress(m, reg[8])){
+							if(ic.isInvalidAddress(reg[8])){
 								interruptFlag = 1;
 							} else {
 								trap();
@@ -313,22 +313,14 @@ public class Sistema {
 
 		public InterruptChecker(){}
 
-		public boolean isInvalidAddress(Word[] m, int index){
-			try {
-				Word instruction = m[index];
-				return false;
-			} catch (IndexOutOfBoundsException error) {
-				return true;
-			}
+		public boolean isInvalidAddress(int index){
+			if(index < 0 || index >= vm.cpu.m.length) return true;
+			return false;
 		}
 
-		public boolean isInvalidAddressRegister(int[] reg, int index){
-			try {
-				int register = reg[index];
-				return false;
-			} catch (IndexOutOfBoundsException error) {
-				return true;
-			}
+		public boolean isInvalidRegister(int index){
+			if(index < 0 || index >= 9) return true;
+			return false;
 		}
 
 		public boolean causesMathematicalOverflow(int a, int b, int operation){
@@ -346,7 +338,7 @@ public class Sistema {
 				default:
 					return true;
 			}
-			if(result > Integer.MAX_VALUE) {return true;}
+			if(result > Integer.MAX_VALUE) return true;
 			return false;
 		}
 	}
