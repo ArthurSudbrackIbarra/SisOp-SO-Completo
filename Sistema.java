@@ -319,7 +319,7 @@ public class Sistema {
 		}
 
 		public boolean isInvalidRegister(int index){
-			if(index < 0 || index >= 9) return true;
+			if(index < 0 || index >= vm.cpu.reg.length) return true;
 			return false;
 		}
 
