@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
 // Código fornecido como parte da solução do projeto de Sistemas Operacionais
@@ -31,7 +33,7 @@ public class Sistema {
 		DATA, ___,		    // se memoria nesta posicao tem um dado, usa DATA, se nao usada ee NULO ___
 		JMP, JMPI, JMPIG, JMPIL, JMPIE,  JMPIM, JMPIGM, JMPILM, JMPIEM, STOP,   // desvios e parada
 		ADDI, SUBI,  ADD, SUB, MULT,         // matematicos
-		LDI, LDD, STD,LDX, STX, SWAP;        // movimentacao
+		LDI, LDD, STD,LDX, STX, SWAP, TRAP;        // movimentacao
 	}
 
 	public class CPU {
@@ -46,7 +48,6 @@ public class Sistema {
 		//*! 2 - Erro de instrucao invalida. switch case
 		// 3 - Erro de overflow em operacao matematica.
 		//*! 4 - Termino de programa. switch case
-
 		private int interruptFlag; // interruptor da CPU
 
 		private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
@@ -55,7 +56,7 @@ public class Sistema {
 
 		public CPU(Word[] _m) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
 			m = _m; 				// usa o atributo 'm' para acessar a memoria.
-			reg = new int[8]; 		// aloca o espaço dos registradores
+			reg = new int[9]; 		// aloca o espaço dos registradores
 			ic = new InterruptChecker();
 		}
 
@@ -66,7 +67,7 @@ public class Sistema {
         public void showState(){
 			System.out.println("       "+ pc); 
 			System.out.print("           ");
-			for (int i=0; i<8; i++) { System.out.print("r"+i);   System.out.print(": "+reg[i]+"     "); };  
+			for (int i=0; i<9; i++) { System.out.print("r"+i);   System.out.print(": "+reg[i]+"     "); };  
 			System.out.println("");
 			System.out.print("           ");  aux.dump(ir);
 		}
@@ -275,11 +276,19 @@ public class Sistema {
 								interruptFlag = 1;
 							} else if (ic.isInvalidAdressRegister(reg, ir.r2)){
 								interruptFlag = 1;
-							} else{
+							} else {
 								int t = reg[ir.r1];
 								reg[ir.r1] = reg[ir.r2];
 								reg[ir.r2] = t;
 							}
+							pc++;
+						break;
+						case TRAP:
+							if(ic.isInvalidAddress(m, reg[8])){
+								interruptFlag = 1;
+							} else {
+								trap();
+							}				
 							pc++;
 						break;
 						case STOP: // por enquanto, para execucao
@@ -368,8 +377,22 @@ public class Sistema {
 	// -------------------------------------------------------------------------------------------------------
 	// ------------------- S O F T W A R E - inicio ----------------------------------------------------------
 
-	// ------------------- VAZIO
+	public void trap(){
+		int inOrOut = vm.cpu.reg[7];
+		int address = vm.cpu.reg[8];
+		if(inOrOut == 1){ // IN
+			Scanner scanner = new Scanner(System.in);
+			System.out.print("[CHAMADA DE SISTEMA ACIONADA COM TRAP] Informe um valor inteiro (IN): ");
+			int value = Integer.parseInt(scanner.nextLine());
+			vm.m[address].opc = Opcode.DATA;
+			vm.m[address].p = value;
+			scanner.close();
+		} else if (inOrOut == 2){ // OUT
+			System.out.println("\n[OUTPUT]\n" + vm.m[address].p + "\n");
+		}
+	}
 	
+	// ------------------- S O F T W A R E - fim ----------------------------------------------------------
 
 	// -------------------------------------------------------------------------------------------------------
     // -------------------  S I S T E M A --------------------------------------------------------------------
@@ -389,8 +412,10 @@ public class Sistema {
 	public static void main(String args[]) {
 		Sistema s = new Sistema();
 		//s.test2();
-		s.test1();
+		//s.test1();
 		//s.test3();
+		//s.testIn();
+		s.testOut();
 	}
     // -------------------------------------------------------------------------------------------------------
     // --------------- TUDO ABAIXO DE MAIN É AUXILIAR PARA FUNCIONAMENTO DO SISTEMA - nao faz parte 
@@ -423,6 +448,30 @@ public class Sistema {
 	public void test3(){
 		Aux aux = new Aux();
 		Word[] p = new Programas().fatorial;
+		aux.carga(p, vm.m);
+		vm.cpu.setContext(0);
+		System.out.println("---------------------------------- programa carregado ");
+		aux.dump(vm.m, 0, 15);
+		vm.cpu.run();
+		System.out.println("---------------------------------- após execucao ");
+		aux.dump(vm.m, 0, 15);
+	}
+
+	public void testIn(){
+		Aux aux = new Aux();
+		Word[] p = new Programas().testIn;
+		aux.carga(p, vm.m);
+		vm.cpu.setContext(0);
+		System.out.println("---------------------------------- programa carregado ");
+		aux.dump(vm.m, 0, 15);
+		vm.cpu.run();
+		System.out.println("---------------------------------- após execucao ");
+		aux.dump(vm.m, 0, 15);
+	}
+
+	public void testOut(){
+		Aux aux = new Aux();
+		Word[] p = new Programas().testOut;
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
@@ -532,6 +581,22 @@ public class Sistema {
 		// passando pelos N valores
 		// faz swap de vizinhos se da esquerda maior que da direita
 		public Word[] bubblesort = new Word[] {};
+
+		public Word[] testIn = new Word[]{
+			new Word(Opcode.LDI, 7, -1, 1),
+			new Word(Opcode.LDI, 8, -1, 10),
+			new Word(Opcode.TRAP, -1, -1, -1),
+			new Word(Opcode.STOP, -1, -1, -1)
+		};
+
+		public Word[] testOut = new Word[]{
+			new Word(Opcode.LDI, 7, -1, 2),
+			new Word(Opcode.LDI, 8, -1, 10),
+			new Word(Opcode.LDI, 1, -1, 800),
+			new Word(Opcode.STD, 1, -1, 10),
+			new Word(Opcode.TRAP, -1, -1, -1),
+			new Word(Opcode.STOP, -1, -1, -1)
+		};
     }
 }
 
