@@ -72,7 +72,8 @@ public class Sistema {
 			System.out.print("           ");  aux.dump(ir);
 		}
 
-		public void run() { 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
+		public void run() { 
+			boolean programHasEnded = false;		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
 			while (true) { 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 				// FETCH
 					ir = m[pc]; 	// busca posicao da memoria apontada por pc, guarda em ir
@@ -292,17 +293,41 @@ public class Sistema {
 							pc++;
 						break;
 						case STOP: // por enquanto, para execucao
+							interruptFlag = 4;
 						break;
+						case DATA:
+						case ___: 
+						break;
+						// Instrucao invalida
 						default:
+							interruptFlag = 2;
 						break;
 					}
 				
 				// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
-				if (ir.opc==Opcode.STOP) {   
-					break; // break sai do loop da cpu
+
+				if(interruptFlag == 0) continue;
+
+				System.out.println("INTERRUPCAO ACIONADA NA POSICAO " + pc + " DE MEMORIA - MOTIVO:");
+
+				switch (interruptFlag) {
+					case 1:
+						System.out.println("Endereco invalido: programa do usuario acessando endereço fora de limites permitidos.");
+					break;
+					case 2:
+						System.out.println("Instrucao invalida: a instrucao carregada é invalida.");
+					break;
+					case 3:
+						System.out.println("Overflow em operacao matematica");
+					break;
+					case 4:
+						System.out.println("Final de programa.");
+						programHasEnded = true;
 				}
 
 				interruptFlag = 0;
+
+				if(programHasEnded) break;
 			}
 		}
 	}
