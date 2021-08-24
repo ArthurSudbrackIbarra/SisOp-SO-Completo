@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+/**
+ * @author Arthur Sudbrack Ibarra, Luiz Eduardo Mello dos Reis, Willian Magnum Albeche
+ */
+
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
 // Código fornecido como parte da solução do projeto de Sistemas Operacionais
@@ -45,9 +49,9 @@ public class Sistema {
 		private InterruptChecker ic;
 		// 0 - Tudo ok.
 		// 1 - Erro de enderecamento de memoria.
-		//*! 2 - Erro de instrucao invalida. switch case
+		// 2 - Erro de instrucao invalida
 		// 3 - Erro de overflow em operacao matematica.
-		//*! 4 - Termino de programa. switch case
+		// 4 - Termino de programa
 		private int interruptFlag; // interruptor da CPU
 
 		private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
