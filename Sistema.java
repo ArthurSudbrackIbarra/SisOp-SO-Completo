@@ -589,7 +589,25 @@ public class Sistema {
 		// se o número for menor que zero coloca -1 no início da posição de memória para saída;
 		// se for maior que zero este é o número de valores da sequencia de fibonacci a
 		// serem escritos em sequencia a partir de uma posição de memória;
-		public Word[] pa = new Word[] {};
+		public Word[] pa = new Word[] {
+			new Word(Opcode.LDI, 2, -1, 1), // termo 1
+			new Word(Opcode.LDI, 3, -1, 1), // termo 2
+			new Word(Opcode.LDI, 4, -1, 15), // percorre a memoria
+			new Word(Opcode.LDI, 5, -1, 100), // 100 nunca sera menor do que 0 (jump incondicional)
+			new Word(Opcode.LDI, 6, -1, 7), // armazena endereco do inicio do "while"
+			new Word(Opcode.LDD, 1, -1, 10), // le da posicao 10 e armazena em r1     
+			new Word(Opcode.LDI, 7, -1, 15),  // armazena endereco do fim do programa
+			//Fibonacci começa aqui
+			new Word(Opcode.JMPIL, 7, 1, -1), // se r1 < 0 vai pra o endereco do fim do programa (15)
+			new Word(Opcode.STX, 4, 2, -1),
+			new Word(Opcode.ADDI, 4, -1, 1),
+			new Word(Opcode.STX, 4, 3, -1),
+			new Word(Opcode.ADD, 2, 3, -1),
+			new Word(Opcode.ADD, 3, 2, -1),
+			new Word(Opcode.SUBI, 1, -1, 1),
+			new Word(Opcode.JMPIG, 6, 5, -1),
+			new Word(Opcode.STOP, -1, -1, -1) // fim do programa
+		};
 
 		// PB: dado um inteiro em alguma posição de memória,
  		// se for negativo armazena -1 na saída; se for positivo responde o fatorial do número na saída
