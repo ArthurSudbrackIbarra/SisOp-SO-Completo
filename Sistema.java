@@ -7,7 +7,7 @@ import java.util.Scanner;
 // PUCRS - Escola Politécnica - Sistemas Operacionais
 // Prof. Fernando Dotti
 // Código fornecido como parte da solução do projeto de Sistemas Operacionais
-//
+// Nomes: Arthur Sudbrack Ibarra, Luiz Eduardo Mello dos Reis e Willian Magnum Albeche
 // Fase 1 - máquina virtual (vide enunciado correspondente)
 //
 public class Sistema {
