@@ -106,10 +106,12 @@ public class Sistema {
 						case LDX:
 							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidAddress(ir.r2)){
+							} else if (ic.isInvalidRegister(ir.r2)){
+								interruptFlag = 1;
+							} else if(ic.isInvalidAddress(reg[ir.r2])){
 								interruptFlag = 1;
 							} else {
-								reg[ir.r1] = m[ir.r2].p;
+								reg[ir.r1] = m[reg[ir.r2]].p;
 							}	
 							pc++;
 						break;
@@ -159,9 +161,9 @@ public class Sistema {
 							pc++;
 						break;
 						case STX: // [Rd] ←Rs
-							if(ic.isInvalidAddress(ir.p)){
+							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
-							} else if (ic.isInvalidRegister(ir.r1)){
+							} else if (ic.isInvalidAddress(reg[ir.r1])){
 								interruptFlag = 1;
 							} else if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1 ;
@@ -436,7 +438,8 @@ public class Sistema {
 		//s.test1();
 		//s.test3();
 		//s.testIn();
-		s.testOut();
+		//s.testOut();
+		s.testPa();
 	}
     // -------------------------------------------------------------------------------------------------------
     // --------------- TUDO ABAIXO DE MAIN É AUXILIAR PARA FUNCIONAMENTO DO SISTEMA - nao faz parte 
@@ -476,6 +479,19 @@ public class Sistema {
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
 		aux.dump(vm.m, 0, 15);
+	}
+
+	public void testPa(){
+		Aux aux = new Aux();
+		Word[] p = new Programas().pa;
+		aux.carga(p, vm.m);
+		vm.cpu.setContext(0);
+		System.out.println("---------------------------------- programa carregado ");
+		vm.m[19] = new Word(Opcode.DATA, -1, -1, 10); // parametro para 10 termos de fibonacci armazenado na posicao 19 da memoria. 
+		aux.dump(vm.m, 0, 40);
+		vm.cpu.run();
+		System.out.println("---------------------------------- após execucao ");
+		aux.dump(vm.m, 0, 40);
 	}
 
 	public void testIn(){
@@ -590,22 +606,27 @@ public class Sistema {
 		// se for maior que zero este é o número de valores da sequencia de fibonacci a
 		// serem escritos em sequencia a partir de uma posição de memória;
 		public Word[] pa = new Word[] {
-			new Word(Opcode.LDI, 2, -1, 1), // termo 1
-			new Word(Opcode.LDI, 3, -1, 1), // termo 2
-			new Word(Opcode.LDI, 4, -1, 15), // percorre a memoria
-			new Word(Opcode.LDI, 5, -1, 100), // 100 nunca sera menor do que 0 (jump incondicional)
-			new Word(Opcode.LDI, 6, -1, 7), // armazena endereco do inicio do "while"
-			new Word(Opcode.LDD, 1, -1, 10), // le da posicao 10 e armazena em r1     
-			new Word(Opcode.LDI, 7, -1, 15),  // armazena endereco do fim do programa
-			//Fibonacci começa aqui
-			new Word(Opcode.JMPIL, 7, 1, -1), // se r1 < 0 vai pra o endereco do fim do programa (15)
-			new Word(Opcode.STX, 4, 2, -1),
-			new Word(Opcode.ADDI, 4, -1, 1),
-			new Word(Opcode.STX, 4, 3, -1),
-			new Word(Opcode.ADD, 2, 3, -1),
-			new Word(Opcode.ADD, 3, 2, -1),
-			new Word(Opcode.SUBI, 1, -1, 1),
-			new Word(Opcode.JMPIG, 6, 5, -1),
+			new Word(Opcode.LDI, 2, -1, 1), // r2 =  1
+			new Word(Opcode.LDI, 3, -1, 1), // r3 = 1
+			new Word(Opcode.LDI, 4, -1, 20), // r4 ira percorrer a memoria
+			new Word(Opcode.LDD, 1, -1, 19), // le da posicao 19 e armazena em r1  
+			new Word(Opcode.LDD, 5, -1, 19), // le da posicao 19 e armazena em r5   
+			new Word(Opcode.LDI, 7, -1, 18),  // armazena em r7 o endereco do fim do programa
+			new Word(Opcode.LDI, 6, -1, 16),  // armazena em r6 o endereco do fim do programa caso o numero (n) seja invalido
+			new Word(Opcode.JMPIL, 6, 5, -1), // se r5 < 0 vai para o endereco do fim do programa caso o numero (n) seja invalido, armazenado em r6
+
+			//Laco Fibonacci comeca aqui
+			new Word(Opcode.JMPIL, 7, 1, -1), // se r1 < 0 vai para o endereco do fim do programa, armazenado em r7
+			new Word(Opcode.STX, 4, 2, -1), // armazena na posicao guardada em r4 o valor de r2
+			new Word(Opcode.ADDI, 4, -1, 1), // incrementa em 1 unidade r4
+			new Word(Opcode.STX, 4, 3, -1), // armazena na posicao guardada em r4 o valor de r3
+			new Word(Opcode.ADD, 3, 2, -1), // r3 = r3 + r2
+			new Word(Opcode.LDX, 2, 4, -1), // r2 = antigo r3
+			new Word(Opcode.SUBI, 1, -1, 1), // decrementa em 1 unidade r1
+			new Word(Opcode.JMP, -1, -1, 5), // volta para o inicio do laco de repeticao
+
+			new Word(Opcode.LDI, 1, -1, -1), // r1 = -1
+			new Word(Opcode.STD, 1, -1, 20), // salva o valor de r1 no início da posição de memoria para saida
 			new Word(Opcode.STOP, -1, -1, -1) // fim do programa
 		};
 
