@@ -656,8 +656,8 @@ public class Sistema {
 			new Word(Opcode.JMPIL, 6, 5, -1), // se r5 < 0 vai para o endereco do fim do programa caso o numero (n) seja invalido, armazenado em r6
 
 			new Word(Opcode.JMPIG, 3, 1, -1), // se r1 > 0 vai para o endereco do laco de repeticao, armazenado em r3
-			new Word(Opcode.STD, 2, -1, 17),
-			new Word(Opcode.STOP, -1, -1, -1),
+			new Word(Opcode.STD, 2, -1, 17), // salva o valor de r2 no no início da posição de memoria para saida
+			new Word(Opcode.STOP, -1, -1, -1), // fim do programa
 
 			new Word(Opcode.LDI, 1, -1, -1), // r1 = -1
 			new Word(Opcode.STD, 1, -1, 17), // salva o valor de r1 no início da posição de memoria para saida
