@@ -439,7 +439,8 @@ public class Sistema {
 		//s.test3();
 		//s.testIn();
 		//s.testOut();
-		s.testPa();
+		//s.testPa();
+		s.testPb();
 	}
     // -------------------------------------------------------------------------------------------------------
     // --------------- TUDO ABAIXO DE MAIN É AUXILIAR PARA FUNCIONAMENTO DO SISTEMA - nao faz parte 
@@ -487,7 +488,20 @@ public class Sistema {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		vm.m[19] = new Word(Opcode.DATA, -1, -1, 10); // parametro para 10 termos de fibonacci armazenado na posicao 19 da memoria. 
+		vm.m[19] = new Word(Opcode.DATA, -1, -1, 10); // parametro para 10 termos de fibonacci armazenado na posicao 19 da memoria
+		aux.dump(vm.m, 0, 40);
+		vm.cpu.run();
+		System.out.println("---------------------------------- após execucao ");
+		aux.dump(vm.m, 0, 40);
+	}
+
+	public void testPb(){
+		Aux aux = new Aux();
+		Word[] p = new Programas().pb;
+		aux.carga(p, vm.m);
+		vm.cpu.setContext(0);
+		System.out.println("---------------------------------- programa carregado ");
+		vm.m[16] = new Word(Opcode.DATA, -1, -1, 7); // parametro para fatorial de 7 (7!) armazenado na posicao 16 de memoria
 		aux.dump(vm.m, 0, 40);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
@@ -623,7 +637,7 @@ public class Sistema {
 			new Word(Opcode.ADD, 3, 2, -1), // r3 = r3 + r2
 			new Word(Opcode.LDX, 2, 4, -1), // r2 = antigo r3
 			new Word(Opcode.SUBI, 1, -1, 1), // decrementa em 1 unidade r1
-			new Word(Opcode.JMP, -1, -1, 5), // volta para o inicio do laco de repeticao
+			new Word(Opcode.JMP, -1, -1, 8), // volta para o inicio do laco de repeticao
 
 			new Word(Opcode.LDI, 1, -1, -1), // r1 = -1
 			new Word(Opcode.STD, 1, -1, 20), // salva o valor de r1 no início da posição de memoria para saida
@@ -632,7 +646,28 @@ public class Sistema {
 
 		// PB: dado um inteiro em alguma posição de memória,
  		// se for negativo armazena -1 na saída; se for positivo responde o fatorial do número na saída
-		public Word[] pb = new Word[] {};
+		public Word[] pb = new Word[] {
+			new Word(Opcode.LDI, 2, -1, 1), // r2 =  1
+			new Word(Opcode.LDI, 3, -1, 13), // armazena em r3 o endereco para o laco de repeticao
+			new Word(Opcode.LDD, 1, -1, 16), // le da posicao 16 e armazena em r1  
+			new Word(Opcode.LDD, 5, -1, 16), // le da posicao 16 e armazena em r5   
+			new Word(Opcode.LDI, 7, -1, 9),  // armazena em r7 o endereco do fim do programa
+			new Word(Opcode.LDI, 6, -1, 10),  // armazena em r6 o endereco do fim do programa caso o numero (n) seja invalido
+			new Word(Opcode.JMPIL, 6, 5, -1), // se r5 < 0 vai para o endereco do fim do programa caso o numero (n) seja invalido, armazenado em r6
+
+			new Word(Opcode.JMPIG, 3, 1, -1), // se r1 > 0 vai para o endereco do laco de repeticao, armazenado em r3
+			new Word(Opcode.STD, 2, -1, 17),
+			new Word(Opcode.STOP, -1, -1, -1),
+
+			new Word(Opcode.LDI, 1, -1, -1), // r1 = -1
+			new Word(Opcode.STD, 1, -1, 17), // salva o valor de r1 no início da posição de memoria para saida
+			new Word(Opcode.STOP, -1, -1, -1), // fim do programa
+
+			//Laco fatorial comeca aqui
+			new Word(Opcode.MULT, 2, 1, -1), // r2 = r2 * r1
+			new Word(Opcode.SUBI, 1, -1, 1), // decrementa r1 em 1 unidade
+			new Word(Opcode.JMP, -1, -1, 7), // volta para a verificacao de r1 > 0
+		};
 
 		// PC: para um N definido (10 por exemplo)
 		// o programa ordena um vetor de N números em alguma posição de memória;
