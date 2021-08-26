@@ -51,7 +51,8 @@ public class Sistema {
 		// 1 - Erro de enderecamento de memoria.
 		// 2 - Erro de instrucao invalida
 		// 3 - Erro de overflow em operacao matematica.
-		// 4 - Termino de programa
+		// 4 - Erro de registrador invalido.
+		// 5 - Termino de programa
 		private int interruptFlag; // interruptor da CPU
 
 		private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
@@ -87,7 +88,7 @@ public class Sistema {
 					switch (ir.opc) { // para cada opcode, sua execução
 						case LDI: // Rd ← k
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else {
 								reg[ir.r1] = ir.p;
 							}					
@@ -95,7 +96,7 @@ public class Sistema {
 						break;
 						case LDD: // Rd ← [A]
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else {
@@ -105,9 +106,9 @@ public class Sistema {
 						break;
 						case LDX: // Rd ← [Rs]
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if(ic.isInvalidAddress(reg[ir.r2])){
 								interruptFlag = 1;
 							} else {
@@ -119,7 +120,7 @@ public class Sistema {
 							if (ic.isInvalidAddress(ir.p)){ 
 								interruptFlag = 1;
 							} else if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else {
 								m[ir.p].opc = Opcode.DATA;
 								m[ir.p].p = reg[ir.r1];
@@ -128,9 +129,9 @@ public class Sistema {
 						break;
 						case ADD: // Rd ← Rd + Rs
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 								interruptFlag = 3;
 							} else {
@@ -140,9 +141,9 @@ public class Sistema {
 						break;
 						case MULT: // Rd ← Rd * Rs
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1 ;
+								interruptFlag = 4 ;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
 								interruptFlag = 3;
 							} else {
@@ -152,7 +153,7 @@ public class Sistema {
 						break;
 						case ADDI: // Rd ← Rd + k
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
 								interruptFlag = 3;
 							} else {
@@ -162,11 +163,11 @@ public class Sistema {
 						break;
 						case STX: // [Rd] ←Rs
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidAddress(reg[ir.r1])){
 								interruptFlag = 1;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1 ;
+								interruptFlag = 4;
 							} else {
 								m[reg[ir.r1]].opc = Opcode.DATA;      
 								m[reg[ir.r1]].p = reg[ir.r2];          
@@ -175,9 +176,9 @@ public class Sistema {
 						break;
 						case SUB: // Rd ← Rd - Rs
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 								interruptFlag = 3;
 							} else{							
@@ -187,7 +188,7 @@ public class Sistema {
 						break;
 						case SUBI: // Rd ← Rd – k
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
 								interruptFlag = 3;
 							} else {
@@ -200,16 +201,16 @@ public class Sistema {
 						break;	
 						case JMPI:
 							if(ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else {
 								pc = reg[ir.r1];
 							}
 						break;
 						case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (reg[ir.r2] > 0) {
 								pc = reg[ir.r1];
 							} else {
@@ -218,9 +219,9 @@ public class Sistema {
 						break;
 						case JMPIL: // if Rc < 0 then PC ← Rs Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if(reg[ir.r2] < 0) {
 								pc = reg[ir.r1];
 							} else {
@@ -229,9 +230,9 @@ public class Sistema {
 						break;
 						case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (reg[ir.r2] == 0) {
 								pc = reg[ir.r1];
 							} else {
@@ -247,7 +248,7 @@ public class Sistema {
 						break;
 						case JMPILM: // if Rc < 0 then PC ← [A] Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] < 0) {
@@ -258,7 +259,7 @@ public class Sistema {
 						break;
 						case JMPIGM: // if Rc > 0 then PC ← [A] Else PC ← PC +1 
 							if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] > 0) {
@@ -269,7 +270,7 @@ public class Sistema {
 						break;
 						case JMPIEM: // if Rc = 0 then PC ← [A] Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else if(reg[ir.r2] == 0) {
@@ -280,9 +281,9 @@ public class Sistema {
 						break;
 						case SWAP: // T ← Ra | Ra ← Rb | Rb ←T
 							if (ic.isInvalidRegister(ir.r1)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else if (ic.isInvalidRegister(ir.r2)){
-								interruptFlag = 1;
+								interruptFlag = 4;
 							} else {
 								int t = reg[ir.r1];
 								reg[ir.r1] = reg[ir.r2];
@@ -299,7 +300,7 @@ public class Sistema {
 							pc++;
 						break;
 						case STOP: // Para a execucao
-							interruptFlag = 4;
+							interruptFlag = 5;
 						break;
 						case DATA:
 						case ___: 
@@ -324,9 +325,12 @@ public class Sistema {
 						System.out.println("Instrucao invalida: a instrucao carregada é invalida.");
 					break;
 					case 3:
-						System.out.println("Overflow em operacao matematica");
+						System.out.println("Overflow em operacao matematica.");
 					break;
 					case 4:
+						System.out.println("Registrador(es) invalido(s) passados como parametro.");
+					break;
+					case 5:
 						System.out.println("Final de programa.");
 						programHasEnded = true;
 				}
