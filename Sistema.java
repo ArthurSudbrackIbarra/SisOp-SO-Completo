@@ -320,15 +320,19 @@ public class Sistema {
 				switch (interruptFlag) {
 					case 1:
 						System.out.println("Endereco invalido: programa do usuario acessando endereço fora de limites permitidos.");
+						programHasEnded = true;
 					break;
 					case 2:
 						System.out.println("Instrucao invalida: a instrucao carregada é invalida.");
+						programHasEnded = true;
 					break;
 					case 3:
 						System.out.println("Overflow em operacao matematica.");
+						programHasEnded = true;
 					break;
 					case 4:
 						System.out.println("Registrador(es) invalido(s) passados como parametro.");
+						programHasEnded = true;
 					break;
 					case 5:
 						System.out.println("Final de programa.");
