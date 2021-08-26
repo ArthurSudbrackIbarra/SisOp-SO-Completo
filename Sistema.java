@@ -93,7 +93,7 @@ public class Sistema {
 							}					
 							pc++;
 						break;
-						case LDD:
+						case LDD: // Rd ← [A]
 							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidAddress(ir.p)){
@@ -103,7 +103,7 @@ public class Sistema {
 							}			
 							pc++;
 						break;
-						case LDX:
+						case LDX: // Rd ← [Rs]
 							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidRegister(ir.r2)){
@@ -185,7 +185,7 @@ public class Sistema {
 							}
 							pc++;
 						break;
-						case SUBI:
+						case SUBI: // Rd ← Rd – k
 							if(ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
@@ -216,7 +216,7 @@ public class Sistema {
 								pc++;
 							}	
 						break;
-						case JMPIL:
+						case JMPIL: // if Rc < 0 then PC ← Rs Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidRegister(ir.r2)){
@@ -238,14 +238,14 @@ public class Sistema {
 								pc++;
 							}
 						break;
-						case JMPIM:
+						case JMPIM: // PC ← [A]
 							if(ic.isInvalidAddress(ir.p)){
 								interruptFlag = 1;
 							} else {
 								pc = m[ir.p].p;
 							}
 						break;
-						case JMPILM:
+						case JMPILM: // if Rc < 0 then PC ← [A] Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidAddress(ir.p)){
@@ -256,7 +256,7 @@ public class Sistema {
 								pc++;
 							}
 						break;
-						case JMPIGM:
+						case JMPIGM: // if Rc > 0 then PC ← [A] Else PC ← PC +1 
 							if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidAddress(ir.p)){
@@ -267,7 +267,7 @@ public class Sistema {
 								pc++;
 							}
 						break;
-						case JMPIEM:
+						case JMPIEM: // if Rc = 0 then PC ← [A] Else PC ← PC +1
 							if (ic.isInvalidRegister(ir.r2)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidAddress(ir.p)){
@@ -278,7 +278,7 @@ public class Sistema {
 								pc++;
 							}							
 						break;
-						case SWAP:
+						case SWAP: // T ← Ra | Ra ← Rb | Rb ←T
 							if (ic.isInvalidRegister(ir.r1)){
 								interruptFlag = 1;
 							} else if (ic.isInvalidRegister(ir.r2)){
@@ -298,7 +298,7 @@ public class Sistema {
 							}				
 							pc++;
 						break;
-						case STOP: // por enquanto, para execucao
+						case STOP: // Para a execucao
 							interruptFlag = 4;
 						break;
 						case DATA:
@@ -677,6 +677,7 @@ public class Sistema {
 		// faz swap de vizinhos se da esquerda maior que da direita
 		public Word[] bubblesort = new Word[] {};
 
+		// Programa para testar a instrucao TRAP com entrada.
 		public Word[] testIn = new Word[]{
 			new Word(Opcode.LDI, 7, -1, 1),
 			new Word(Opcode.LDI, 8, -1, 10),
@@ -684,6 +685,7 @@ public class Sistema {
 			new Word(Opcode.STOP, -1, -1, -1)
 		};
 
+		// Programa para testar a instrucao TRAP com saida.
 		public Word[] testOut = new Word[]{
 			new Word(Opcode.LDI, 7, -1, 2),
 			new Word(Opcode.LDI, 8, -1, 10),
