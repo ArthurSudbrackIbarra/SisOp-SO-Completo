@@ -340,20 +340,25 @@ public class Sistema {
     // ------------------ C P U - fim ------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------
 
+	// Classe auxiliar responsavel por checar se certas interrupcoes ocorrem.
 	public class InterruptChecker {
 
 		public InterruptChecker(){}
 
+		// Checa se um endereco de memoria e invalido.
 		public boolean isInvalidAddress(int index){
 			if(index < 0 || index >= vm.cpu.m.length) return true;
 			return false;
 		}
 
+		// Checa se um registrador e invalido.
 		public boolean isInvalidRegister(int index){
 			if(index < 0 || index >= vm.cpu.reg.length) return true;
 			return false;
 		}
 
+		// Checa se uma operacao matematica de soma, subtracao ou multiplicacao causa
+		// overflow de numero inteiro.
 		public boolean causesMathematicalOverflow(int a, int b, int operation){
 			long result;
 			switch (operation) {
@@ -369,7 +374,7 @@ public class Sistema {
 				default:
 					return true;
 			}
-			if(result > Integer.MAX_VALUE) return true;
+			if(result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) return true;
 			return false;
 		}
 	}
