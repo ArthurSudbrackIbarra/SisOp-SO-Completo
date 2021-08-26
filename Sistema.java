@@ -498,7 +498,7 @@ public class Sistema {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		vm.m[19] = new Word(Opcode.DATA, -1, -1, 10); // parametro para 10 termos de fibonacci armazenado na posicao 19 da memoria
+		vm.m[20] = new Word(Opcode.DATA, -1, -1, 10); // parametro para 10 termos de fibonacci armazenado na posicao 20 da memoria
 		aux.dump(vm.m, 0, 40);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
@@ -644,11 +644,12 @@ public class Sistema {
 		public Word[] pa = new Word[] {
 			new Word(Opcode.LDI, 2, -1, 1), // r2 =  1
 			new Word(Opcode.LDI, 3, -1, 1), // r3 = 1
-			new Word(Opcode.LDI, 4, -1, 20), // r4 ira percorrer a memoria
-			new Word(Opcode.LDD, 1, -1, 19), // le da posicao 19 e armazena em r1  
-			new Word(Opcode.LDD, 5, -1, 19), // le da posicao 19 e armazena em r5   
-			new Word(Opcode.LDI, 7, -1, 18),  // armazena em r7 o endereco do fim do programa
-			new Word(Opcode.LDI, 6, -1, 16),  // armazena em r6 o endereco do fim do programa caso o numero (n) seja invalido
+			new Word(Opcode.LDI, 4, -1, 21), // r4 ira percorrer a memoria
+			new Word(Opcode.LDD, 1, -1, 20), // le da posicao 20 e armazena em r1  
+			new Word(Opcode.SUBI, 1, -1, 2), // r1 = r1 - 2
+			new Word(Opcode.LDD, 5, -1, 20), // le da posicao 20 e armazena em r5   
+			new Word(Opcode.LDI, 7, -1, 19),  // armazena em r7 o endereco do fim do programa
+			new Word(Opcode.LDI, 6, -1, 17),  // armazena em r6 o endereco do fim do programa caso o numero (n) seja invalido
 			new Word(Opcode.JMPIL, 6, 5, -1), // se r5 < 0 vai para o endereco do fim do programa caso o numero (n) seja invalido, armazenado em r6
 
 			//Laco Fibonacci comeca aqui
@@ -659,7 +660,7 @@ public class Sistema {
 			new Word(Opcode.ADD, 3, 2, -1), // r3 = r3 + r2
 			new Word(Opcode.LDX, 2, 4, -1), // r2 = antigo r3
 			new Word(Opcode.SUBI, 1, -1, 1), // decrementa em 1 unidade r1
-			new Word(Opcode.JMP, -1, -1, 8), // volta para o inicio do laco de repeticao
+			new Word(Opcode.JMP, -1, -1, 9), // volta para o inicio do laco de repeticao
 
 			new Word(Opcode.LDI, 1, -1, -1), // r1 = -1
 			new Word(Opcode.STD, 1, -1, 20), // salva o valor de r1 no início da posição de memoria para saida
