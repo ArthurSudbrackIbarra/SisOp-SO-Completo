@@ -1,0 +1,310 @@
+// -------------------------------------------------------------------------------------------------------
+// --------------------- C P U  -  definicoes da CPU ----------------------------------------------------- 
+
+public class CPU {
+	// característica do processador: contexto da CPU ...
+	private int pc; 			// ... composto de program counter,
+	private Word ir; 			// instruction register,
+	public int[] reg;       	// registradores da CPU
+
+	private MySystem system; // objeto MySystem para se comunicar com o sistema.
+	
+	private InterruptChecker ic;
+	// 0 - Tudo ok.
+	// 1 - Erro de enderecamento de memoria.
+	// 2 - Erro de instrucao invalida
+	// 3 - Erro de overflow em operacao matematica.
+	// 4 - Erro de registrador invalido.
+	// 5 - Termino de programa
+	private int interruptFlag; // interruptor da CPU
+	
+	public Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
+	
+	private Auxiliary aux = new Auxiliary();
+	
+	public CPU(Word[] _m, MySystem system) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
+		m = _m; 				// usa o atributo 'm' para acessar a memoria.
+		reg = new int[9]; 		// aloca o espaço dos registradores
+		ic = new InterruptChecker(system);
+
+		this.system = system;
+	}
+	
+	public void setContext(int _pc) {  // no futuro esta funcao vai ter que ser 
+		pc = _pc;                                              // limite e pc (deve ser zero nesta versao)
+	}
+	
+	public void showState(){
+		System.out.println("       "+ pc); 
+		System.out.print("           ");
+		for (int i=0; i<9; i++) { System.out.print("r"+i);   System.out.print(": "+reg[i]+"     "); };  
+		System.out.println("");
+		System.out.print("           ");  aux.dump(ir);
+	}
+	
+	public void run() { 
+		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
+		while (true) { 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
+			// FETCH
+			ir = m[pc]; 	// busca posicao da memoria apontada por pc, guarda em ir
+			//if debug
+			showState();
+			// EXECUTA INSTRUCAO NO ir
+			switch (ir.opc) { // para cada opcode, sua execução
+				case LDI: // Rd ← k
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else {
+					reg[ir.r1] = ir.p;
+				}					
+				pc++;
+				break;
+				case LDD: // Rd ← [A]
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidAddress(ir.p)){
+					interruptFlag = 1;
+				} else {
+					reg[ir.r1] = m[ir.p].p;
+				}			
+				pc++;
+				break;
+				case LDX: // Rd ← [Rs]
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if(ic.isInvalidAddress(reg[ir.r2])){
+					interruptFlag = 1;
+				} else {
+					reg[ir.r1] = m[reg[ir.r2]].p;
+				}	
+				pc++;
+				break;
+				case STD: // [A] ← Rs
+				if (ic.isInvalidAddress(ir.p)){ 
+					interruptFlag = 1;
+				} else if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else {
+					m[ir.p].opc = Opcode.DATA;
+					m[ir.p].p = reg[ir.r1];
+				}
+				pc++;
+				break;
+				case ADD: // Rd ← Rd + Rs
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
+					interruptFlag = 3;
+				} else {
+					reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
+				}
+				pc++;
+				break;
+				case MULT: // Rd ← Rd * Rs
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4 ;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
+					interruptFlag = 3;
+				} else {
+					reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
+				}
+				pc++;
+				break;
+				case ADDI: // Rd ← Rd + k
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
+					interruptFlag = 3;
+				} else {
+					reg[ir.r1] = reg[ir.r1] + ir.p;
+				}
+				pc++;
+				break;
+				case STX: // [Rd] ←Rs
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidAddress(reg[ir.r1])){
+					interruptFlag = 1;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else {
+					m[reg[ir.r1]].opc = Opcode.DATA;      
+					m[reg[ir.r1]].p = reg[ir.r2];          
+				}
+				pc++;
+				break;
+				case SUB: // Rd ← Rd - Rs
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
+					interruptFlag = 3;
+				} else{							
+					reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
+				}
+				pc++;
+				break;
+				case SUBI: // Rd ← Rd – k
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
+					interruptFlag = 3;
+				} else {
+					reg[ir.r1] = reg[ir.r1] - ir.p;
+				}
+				pc++;
+				break;
+				case JMP: //  PC ← k
+				pc = ir.p;
+				break;	
+				case JMPI:
+				if(ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else {
+					pc = reg[ir.r1];
+				}
+				break;
+				case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (reg[ir.r2] > 0) {
+					pc = reg[ir.r1];
+				} else {
+					pc++;
+				}	
+				break;
+				case JMPIL: // if Rc < 0 then PC ← Rs Else PC ← PC +1
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if(reg[ir.r2] < 0) {
+					pc = reg[ir.r1];
+				} else {
+					pc++;
+				}
+				break;
+				case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (reg[ir.r2] == 0) {
+					pc = reg[ir.r1];
+				} else {
+					pc++;
+				}
+				break;
+				case JMPIM: // PC ← [A]
+				if(ic.isInvalidAddress(ir.p)){
+					interruptFlag = 1;
+				} else {
+					pc = m[ir.p].p;
+				}
+				break;
+				case JMPILM: // if Rc < 0 then PC ← [A] Else PC ← PC +1
+				if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidAddress(ir.p)){
+					interruptFlag = 1;
+				} else if(reg[ir.r2] < 0) {
+					pc = m[ir.p].p;
+				} else {
+					pc++;
+				}
+				break;
+				case JMPIGM: // if Rc > 0 then PC ← [A] Else PC ← PC +1 
+				if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidAddress(ir.p)){
+					interruptFlag = 1;
+				} else if(reg[ir.r2] > 0) {
+					pc = m[ir.p].p;
+				} else {
+					pc++;
+				}
+				break;
+				case JMPIEM: // if Rc = 0 then PC ← [A] Else PC ← PC +1
+				if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidAddress(ir.p)){
+					interruptFlag = 1;
+				} else if(reg[ir.r2] == 0) {
+					pc = m[ir.p].p;
+				} else {
+					pc++;
+				}							
+				break;
+				case SWAP: // T ← Ra | Ra ← Rb | Rb ←T
+				if (ic.isInvalidRegister(ir.r1)){
+					interruptFlag = 4;
+				} else if (ic.isInvalidRegister(ir.r2)){
+					interruptFlag = 4;
+				} else {
+					int t = reg[ir.r1];
+					reg[ir.r1] = reg[ir.r2];
+					reg[ir.r2] = t;
+				}
+				pc++;
+				break;
+				case TRAP:
+				if(ic.isInvalidAddress(reg[8])){
+					interruptFlag = 1;
+				} else {
+					system.trap();
+				}				
+				pc++;
+				break;
+				case STOP: // Para a execucao
+				interruptFlag = 5;
+				break;
+				case DATA:
+				case ___: 
+				break;
+				// Instrucao invalida
+				default:
+				interruptFlag = 2;
+				break;
+			}
+			
+			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
+			
+			// Nao houve interrupcao.
+			if(interruptFlag == 0) continue;
+			
+			// Houve interrupcao.
+			System.out.println("INTERRUPCAO ACIONADA NA POSICAO " + pc + " DE MEMORIA - MOTIVO:");
+			
+			switch (interruptFlag) {
+				case 1:
+				System.out.println("Endereco invalido: programa do usuario acessando endereço fora de limites permitidos.");
+				break;
+				case 2:
+				System.out.println("Instrucao invalida: a instrucao carregada é invalida.");
+				break;
+				case 3:
+				System.out.println("Overflow em operacao matematica.");
+				break;
+				case 4:
+				System.out.println("Registrador(es) invalido(s) passados como parametro.");
+				break;
+				case 5:
+				System.out.println("Final de programa.");
+			}
+			
+			interruptFlag = 0;
+			break;
+		}
+	}
+}
+// ------------------ C P U - fim ------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------
