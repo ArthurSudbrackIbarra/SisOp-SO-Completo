@@ -50,6 +50,7 @@ public class CPU {
 			showState();
 			// EXECUTA INSTRUCAO NO ir
 			switch (ir.opc) { // para cada opcode, sua execução
+
 				case LDI: // Rd ← k
 				if(ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -58,6 +59,7 @@ public class CPU {
 				}					
 				pc++;
 				break;
+
 				case LDD: // Rd ← [A]
 				if(ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -68,6 +70,7 @@ public class CPU {
 				}			
 				pc++;
 				break;
+
 				case LDX: // Rd ← [Rs]
 				if(ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -80,6 +83,7 @@ public class CPU {
 				}	
 				pc++;
 				break;
+
 				case STD: // [A] ← Rs
 				if (ic.isInvalidAddress(ir.p)){ 
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
@@ -91,6 +95,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case ADD: // Rd ← Rd + Rs
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -103,6 +108,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case MULT: // Rd ← Rd * Rs
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER ;
@@ -115,6 +121,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case ADDI: // Rd ← Rd + k
 				if(ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -125,6 +132,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case STX: // [Rd] ←Rs
 				if(ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -138,6 +146,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case SUB: // Rd ← Rd - Rs
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -150,6 +159,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case SUBI: // Rd ← Rd – k
 				if(ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -160,6 +170,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case JMP: //  PC ← k
 				pc = ir.p;
 				break;	
@@ -170,6 +181,7 @@ public class CPU {
 					pc = reg[ir.r1];
 				}
 				break;
+
 				case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -181,6 +193,7 @@ public class CPU {
 					pc++;
 				}	
 				break;
+
 				case JMPIL: // if Rc < 0 then PC ← Rs Else PC ← PC +1
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -192,6 +205,7 @@ public class CPU {
 					pc++;
 				}
 				break;
+
 				case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -203,6 +217,7 @@ public class CPU {
 					pc++;
 				}
 				break;
+
 				case JMPIM: // PC ← [A]
 				if(ic.isInvalidAddress(ir.p)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
@@ -210,6 +225,7 @@ public class CPU {
 					pc = m[ir.p].p;
 				}
 				break;
+
 				case JMPILM: // if Rc < 0 then PC ← [A] Else PC ← PC +1
 				if (ic.isInvalidRegister(ir.r2)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -221,6 +237,7 @@ public class CPU {
 					pc++;
 				}
 				break;
+
 				case JMPIGM: // if Rc > 0 then PC ← [A] Else PC ← PC +1 
 				if (ic.isInvalidRegister(ir.r2)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -232,6 +249,7 @@ public class CPU {
 					pc++;
 				}
 				break;
+
 				case JMPIEM: // if Rc = 0 then PC ← [A] Else PC ← PC +1
 				if (ic.isInvalidRegister(ir.r2)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -243,6 +261,7 @@ public class CPU {
 					pc++;
 				}							
 				break;
+
 				case SWAP: // T ← Ra | Ra ← Rb | Rb ←T
 				if (ic.isInvalidRegister(ir.r1)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -255,6 +274,7 @@ public class CPU {
 				}
 				pc++;
 				break;
+
 				case TRAP:
 				if(ic.isInvalidAddress(reg[8])){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
@@ -263,12 +283,15 @@ public class CPU {
 				}				
 				pc++;
 				break;
+
 				case STOP: // Para a execucao
 				interruptFlag = InterruptTypes.END_OF_PROGRAM;
 				break;
+
 				case DATA:
 				case ___: 
 				break;
+				
 				// Instrucao invalida
 				default:
 				interruptFlag = InterruptTypes.INVALID_INSTRUCTION;
