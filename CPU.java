@@ -41,9 +41,9 @@ public class CPU {
 	}
 	
 	public void run() { 
-		InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
 		while (true) { 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
+			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
 			// FETCH
 			ir = m[pc]; 	// busca posicao da memoria apontada por pc, guarda em ir
 			//if debug
