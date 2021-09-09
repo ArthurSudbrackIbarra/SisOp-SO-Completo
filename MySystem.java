@@ -27,13 +27,13 @@ public class MySystem {
 		int address = vm.cpu.reg[8];
 		if(inOrOut == 1){ // IN
 			Scanner scanner = new Scanner(System.in);
-			System.out.print("[CHAMADA DE SISTEMA ACIONADA COM TRAP] Informe um valor inteiro (IN): ");
+			System.out.print("[CHAMADA DE SISTEMA TRAP] Informe um valor inteiro (IN): ");
 			int value = Integer.parseInt(scanner.nextLine());
 			vm.m[address].opc = Opcode.DATA;
 			vm.m[address].p = value;
 			scanner.close();
 		} else if (inOrOut == 2){ // OUT
-			System.out.println("\n[OUTPUT]\n" + vm.m[address].p + "\n");
+			System.out.println("\n[CHAMADA DE SISTEMA TRAP] [OUTPUT]\n" + vm.m[address].p + "\n");
 		}
 	}
 	
