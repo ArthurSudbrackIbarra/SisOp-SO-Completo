@@ -89,7 +89,20 @@ public class Programs {
         
         new Word(Opcode.LDI, 1, -1, -1), // r1 = -1
         new Word(Opcode.STD, 1, -1, 20), // salva o valor de r1 no início da posição de memoria para saida
-        new Word(Opcode.STOP, -1, -1, -1) // fim do programa
+        new Word(Opcode.STOP, -1, -1, -1), // fim do programa
+
+        new Word(Opcode.DATA, -1, -1, 10), // 10 termos de fibonacci
+
+        new Word(Opcode.DATA, -1, -1, -1), // Onde serao armazenados os resultados
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1)
     };
     
     // PB: dado um inteiro em alguma posição de memória,
@@ -115,6 +128,10 @@ public class Programs {
         new Word(Opcode.MULT, 2, 1, -1), // r2 = r2 * r1
         new Word(Opcode.SUBI, 1, -1, 1), // decrementa r1 em 1 unidade
         new Word(Opcode.JMP, -1, -1, 7), // volta para a verificacao de r1 > 0
+
+        new Word(Opcode.DATA, -1, -1, 7), // fatorial de 7
+        
+        new Word(Opcode.DATA, -1, -1, -1) // Onde sera armazenados o resultado
     };
     
     // PC: para um N definido (10 por exemplo)
@@ -128,29 +145,29 @@ public class Programs {
         // se quiser alterar os 5 valores, basta mudar o k das linhas de LDI, caso adicione alguma linha
         // precisara refatorar o codigo, alterando alguns k's (das linhas onde passamos os pc's) para que o programa nao quebre
         new Word(Opcode.LDI, 1, -1, 17), //colocando o valor 5 na posicao 60 da memoria, porem vamos considerar como [0]
-        new Word(Opcode.STD, 1, -1, 60), //[0] = 17
+        new Word(Opcode.STD, 1, -1, 48), //[0] = 17
         new Word(Opcode.LDI, 1, -1, 21),
-        new Word(Opcode.STD, 1, -1, 61), //[1] = 21
+        new Word(Opcode.STD, 1, -1, 49), //[1] = 21
         new Word(Opcode.LDI, 1, -1, 4),
-        new Word(Opcode.STD, 1, -1, 62), //[2] = 4
+        new Word(Opcode.STD, 1, -1, 50), //[2] = 4
         new Word(Opcode.LDI, 1, -1, 3),
-        new Word(Opcode.STD, 1, -1, 63), //[3] = 3
+        new Word(Opcode.STD, 1, -1, 51), //[3] = 3
         new Word(Opcode.LDI, 1, -1, 7),
-        new Word(Opcode.STD, 1, -1, 64), //[4] = 7
+        new Word(Opcode.STD, 1, -1, 52), //[4] = 7
         
-        new Word(Opcode.LDI, 1, -1, 60), // passando a posicao [0] p/ o registrador 1 o inicio do vetor
-        new Word(Opcode.STD, 1, -1, 50), // marcando o incio do vetor em memoria
-        new Word(Opcode.STD, 1, -1, 51), // i = incio do vetor em memoria
-        new Word(Opcode.STD, 1, -1, 52), // j = incio do vetor em memoria
-        new Word(Opcode.LDI, 1, -1, 61),  // j+1 no r1
-        new Word(Opcode.STD, 1, -1, 53), // j+1 no r1
-        new Word(Opcode.LDI, 1, -1, 65),  // fim do vetor no r1
-        new Word(Opcode.STD, 1, -1, 54), // marcando o final do vetor em memoria
+        new Word(Opcode.LDI, 1, -1, 48), // passando a posicao [0] p/ o registrador 1 o inicio do vetor
+        new Word(Opcode.STD, 1, -1, 43), // marcando o incio do vetor em memoria
+        new Word(Opcode.STD, 1, -1, 44), // i = incio do vetor em memoria
+        new Word(Opcode.STD, 1, -1, 45), // j = incio do vetor em memoria
+        new Word(Opcode.LDI, 1, -1, 49),  // j+1 no r1
+        new Word(Opcode.STD, 1, -1, 46), // j+1 no r1
+        new Word(Opcode.LDI, 1, -1, 53),  // fim do vetor no r1
+        new Word(Opcode.STD, 1, -1, 47), // marcando o final do vetor em memoria
         // inicio for i =0 i<5 i++
-        new Word(Opcode.LDD, 1, -1, 51), // i = posicao do vet
+        new Word(Opcode.LDD, 1, -1, 44), // i = posicao do vet
         // inicio for j =0 j<4 i++
-        new Word(Opcode.LDD, 2, -1, 52), // passando a posicao [0] p/ o registrador 2 j=0 --20
-        new Word(Opcode.LDD, 3, -1, 53), // passando a posicao [1] p/ o registrador 3 j+1
+        new Word(Opcode.LDD, 2, -1, 45), // passando a posicao [0] p/ o registrador 2 j=0 --20
+        new Word(Opcode.LDD, 3, -1, 46), // passando a posicao [1] p/ o registrador 3 j+1
         // condicional
         new Word(Opcode.LDX, 4, 2, -1), // passando dado de j para variaver r4
         new Word(Opcode.LDX, 5, 3, -1), // passando dado de j+1 para variaver r5
@@ -166,34 +183,49 @@ public class Programs {
         // incrementa do j
         new Word(Opcode.ADDI, 2, -1, 1), //j++ -- pc 31
         new Word(Opcode.ADDI, 3, -1, 1), //(j+1)++
-        new Word(Opcode.LDD, 4, -1, 54),
+        new Word(Opcode.LDD, 4, -1, 47),
         new Word(Opcode.SUB, 4, 3, -1),
         new Word(Opcode.LDI, 5, -1, 21), // passa para r5 a posicao do inicio do condicional
         new Word(Opcode.JMPIG, 5, 4, -1),
         // incrementa do i
         new Word(Opcode.ADDI, 1, -1, 1), // i++
-        new Word(Opcode.LDD, 4, -1, 54), // passa ultima posicao do vetor p/ r4
+        new Word(Opcode.LDD, 4, -1, 47), // passa ultima posicao do vetor p/ r4
         new Word(Opcode.SUB, 4, 1, -1), // subtrai o valor de r4 pelo de r1
         new Word(Opcode.LDI, 5, -1, 19), // passa para r5 a posicao do inicio do loop de i
         new Word(Opcode.JMPIG, 5, 4, -1),  // se r4>0 entao vetor ainta possui numeros, entao voltar p/ incio do for de I na var r5
-        new Word(Opcode.STOP, -1, -1, -1)
+        new Word(Opcode.STOP, -1, -1, -1),
+
+        new Word(Opcode.DATA, -1, -1, -1), // Onde serao armazenados os resultados
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1),
+        new Word(Opcode.DATA, -1, -1, -1)
     };
     
     // Programa para testar a instrucao TRAP com entrada.
     public Word[] testIn = new Word[]{
         new Word(Opcode.LDI, 7, -1, 1),
-        new Word(Opcode.LDI, 8, -1, 10),
+        new Word(Opcode.LDI, 8, -1, 4),
         new Word(Opcode.TRAP, -1, -1, -1),
-        new Word(Opcode.STOP, -1, -1, -1)
+        new Word(Opcode.STOP, -1, -1, -1),
+
+        new Word(Opcode.DATA, -1, -1, -1) // Onde sera armazenado o resultado
     };
     
     // Programa para testar a instrucao TRAP com saida.
     public Word[] testOut = new Word[]{
         new Word(Opcode.LDI, 7, -1, 2),
-        new Word(Opcode.LDI, 8, -1, 10),
+        new Word(Opcode.LDI, 8, -1, 6),
         new Word(Opcode.LDI, 1, -1, 800),
-        new Word(Opcode.STD, 1, -1, 10),
+        new Word(Opcode.STD, 1, -1, 6),
         new Word(Opcode.TRAP, -1, -1, -1),
-        new Word(Opcode.STOP, -1, -1, -1)
+        new Word(Opcode.STOP, -1, -1, -1),
+
+        new Word(Opcode.DATA, -1, -1, -1) // Onde sera armazenado o resultado
     };
 }    

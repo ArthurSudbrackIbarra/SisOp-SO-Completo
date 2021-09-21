@@ -46,10 +46,10 @@ public class MySystem {
 		//s.test1(); // Descomente para testar progMinimo
 		//s.test2(); // Descomente para testar fibonacci10
 		//s.test3(); // Descomente para testar fatorial
-		//s.testPa(); // Descomente para testar fibonacci modificado (PA)
+		s.testPa(); // Descomente para testar fibonacci modificado (PA)
 		//s.testPb(); // Descomente para testar fatorial modificado (PB)
 		//s.testPc(); // Descomente para testar bubblesort (PC)
-		s.testIn(); // Descomente para testar a instrucao TRAP com entrada
+		//s.testIn(); // Descomente para testar a instrucao TRAP com entrada
 		//s.testOut(); // Descomente para testar a instrucao TRAP com saida.
 	}
     // -------------------------------------------------------------------------------------------------------
@@ -98,11 +98,10 @@ public class MySystem {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		vm.m[20] = new Word(Opcode.DATA, -1, -1, 10); // parametro para 10 termos de fibonacci armazenado na posicao 20 da memoria
-		aux.dump(vm.m, 0, 40);
+		aux.dump(vm.m, 0, p.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, 40);
+		aux.dump(vm.m, 0, p.length);
 	}
 
 	public void testPb(){
@@ -111,11 +110,10 @@ public class MySystem {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		vm.m[16] = new Word(Opcode.DATA, -1, -1, 7); // parametro para fatorial de 7 (7!) armazenado na posicao 16 de memoria
-		aux.dump(vm.m, 0, 40);
+		aux.dump(vm.m, 0, p.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, 40);
+		aux.dump(vm.m, 0, p.length);
 	}
 
 	public void testPc(){
@@ -124,10 +122,10 @@ public class MySystem {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, 70);
+		aux.dump(vm.m, 0, p.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, 70);
+		aux.dump(vm.m, 0, p.length);
 	}
 
 	public void testIn(){
@@ -136,10 +134,10 @@ public class MySystem {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, 15);
+		aux.dump(vm.m, 0, p.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, 15);
+		aux.dump(vm.m, 0, p.length);
 	}
 
 	public void testOut(){
@@ -148,10 +146,10 @@ public class MySystem {
 		aux.carga(p, vm.m);
 		vm.cpu.setContext(0);
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, 15);
+		aux.dump(vm.m, 0, p.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, 15);
+		aux.dump(vm.m, 0, p.length);
 	}
 
 }
