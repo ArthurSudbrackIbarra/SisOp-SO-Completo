@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 // -------------------------------------------------------------------------------------------------------
 // --------------------- C P U  -  definicoes da CPU ----------------------------------------------------- 
 
@@ -6,22 +8,27 @@ public class CPU {
 	// característica do processador: contexto da CPU ...
 	private int pc; 			// ... composto de program counter,
 	private Word ir; 			// instruction register,
-	public int[] reg;       	// registradores da CPU
+	private int[] reg;       	// registradores da CPU
 	
-	public Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
+	private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
 	private MemoryManager memoryManager;
-	
+
+	private LinkedList<Integer> pageTable;
+
 	private Auxiliary aux;
-	
-	public CPU(Word[] m, MemoryManager memoryManager) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
+
+	public CPU(Word[] m, MemoryManager memoryManager) {  
+		this.pc = 0; 
+		this.ir = null;
+		reg = new int[9]; 		// aloca o espaço dos registradores
 		this.m = m;		
 		this.memoryManager = memoryManager; // usa o atributo 'm' para acessar a memoria.
+		this.pageTable = null;
 		this.aux = new Auxiliary(memoryManager);		
-		reg = new int[9]; 		// aloca o espaço dos registradores
 	}
 	
-	public void setContext(int _pc) {  // no futuro esta funcao vai ter que ser 
-		pc = _pc;                                              // limite e pc (deve ser zero nesta versao)
+	public void setContext(int _pc) {  
+		pc = _pc;                                              
 	}
 	
 	public void showState(){
@@ -31,13 +38,19 @@ public class CPU {
 		System.out.println("");
 		System.out.print("           ");  aux.dump(ir);
 	}
+
+	public void loadPCB(PCB pcb){
+		this.pc = pcb.getPc();
+		this.reg = pcb.getReg();
+		this.pageTable = pcb.getTablePage();
+	}
 	
 	public void run() { 
 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
 		while (true) { 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
 			// FETCH
-			ir = m[pc]; 	// busca posicao da memoria apontada por pc, guarda em ir
+			ir = m[memoryManager.translate(pc, pageTable)]; 	// busca posicao da memoria apontada por pc, guarda em ir
 			//if debug
 			showState();
 			// EXECUTA INSTRUCAO NO ir

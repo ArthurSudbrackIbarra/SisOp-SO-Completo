@@ -11,11 +11,19 @@
 public class MySystem {
 
 	public VM vm;
+	private Auxiliary aux;
+
+	private ProcessManager processManager;
 
     public MySystem(){   // a VM com tratamento de interrupções
+
 		int MEMORY_SIZE = 45;
 		int PAGE_SIZE = 5;
 		vm = new VM(MEMORY_SIZE, PAGE_SIZE);
+
+		this.aux = new Auxiliary(vm.memoryManager);
+		this.processManager = new ProcessManager(vm.memoryManager);
+
 	}
 	
     // -------------------------------------------------------------------------------------------------------
@@ -36,10 +44,7 @@ public class MySystem {
 
 	// -------------------------------------------- teste do sistema ,  veja classe de programas
 	public void test1(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().fibonacci10;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().fibonacci10;
 		System.out.println("---------------------------------- programa carregado ");
 		aux.dump(vm.m, 0, 33);
 		vm.cpu.run();
@@ -48,10 +53,7 @@ public class MySystem {
 	}
 
 	public void test2(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().progMinimo;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().progMinimo;
 		System.out.println("---------------------------------- programa carregado ");
 		aux.dump(vm.m, 0, 15);
 		System.out.println("---------------------------------- após execucao ");
@@ -60,10 +62,7 @@ public class MySystem {
 	}
 
 	public void test3(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().fatorial;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().fatorial;
 		System.out.println("---------------------------------- programa carregado ");
 		aux.dump(vm.m, 0, 15);
 		vm.cpu.run();
@@ -72,63 +71,55 @@ public class MySystem {
 	}
 
 	public void testPa(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().pa;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().pa;
+
+		boolean createdProcess = processManager.createProcess(vm.m, program);
+		if(!createdProcess){
+			System.out.println("O processo não pôde ser criado!");
+		}
+
+
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 		// vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 	}
 
 	public void testPb(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().pb;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().pb;
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 	}
 
 	public void testPc(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().pc;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().pc;
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 	}
 
 	public void testIn(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().testIn;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().testIn;
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 	}
 
 	public void testOut(){
-		Auxiliary aux = new Auxiliary(vm.memoryManager);
-		Word[] p = new Programs().testOut;
-		aux.carga(p, vm.m);
-		vm.cpu.setContext(0);
+		Word[] program = new Programs().testOut;
 		System.out.println("---------------------------------- programa carregado ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, p.length);
+		aux.dump(vm.m, 0, program.length);
 	}
 
 }
