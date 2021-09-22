@@ -17,8 +17,8 @@ public class MySystem {
 
     public MySystem(){   // a VM com tratamento de interrupções
 
-		int MEMORY_SIZE = 45;
-		int PAGE_SIZE = 5;
+		int MEMORY_SIZE = 1024;
+		int PAGE_SIZE = 16;
 		vm = new VM(MEMORY_SIZE, PAGE_SIZE);
 
 		this.aux = new Auxiliary(vm.memoryManager);
@@ -29,29 +29,29 @@ public class MySystem {
     // -------------------------------------------------------------------------------------------------------
     // ------------------- instancia e testa sistema
 	public static void main(String args[]) {
-		MySystem system = new MySystem();		
-		system.testProgram(Programs.pa);
+
+		MySystem system = new MySystem();	
+
+		system.testProgram("PA", Programs.pa);
+		system.testProgram("PB", Programs.pb);
+		system.testProgram("PC", Programs.pc);
+
 	}
     // -------------------------------------------------------------------------------------------------------
     // --------------- TUDO ABAIXO DE MAIN É AUXILIAR PARA FUNCIONAMENTO DO SISTEMA - nao faz parte 
 
 	// -------------------------------------------- teste do sistema ,  veja classe de programas
 
-	public void testProgram(Word[] program){
+	public void testProgram(String programName, Program program){
 
 		boolean createdProcess = processManager.createProcess(vm.m, program);
-		if(!createdProcess){
-			System.out.println("O processo não pôde ser criado!");
-			return;
+
+		if(createdProcess){
+			System.out.println("O processo para o programa " + program.getName() + " foi adicionado a fila com sucesso!");
+		} else {
+			System.out.println("O processo para o programa " + program.getName() + " não pôde ser criado!");
 		}
 
-		PCB nextProcess = processManager.nextProcess();
-		vm.cpu.loadPCB(nextProcess);
-
-		vm.cpu.run();
-
-		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, vm.m.length);
 	}
 
 }

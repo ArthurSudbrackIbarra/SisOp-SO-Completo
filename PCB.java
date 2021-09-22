@@ -28,9 +28,5 @@ public class PCB {
     public LinkedList<Integer> getTablePage(){
         return tablePage;
     }
-
-    public void incrementPc(){
-        pc++;
-    }
     
 }

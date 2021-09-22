@@ -16,16 +16,19 @@ public class CPU {
 	private int currentProcessId;
 	private LinkedList<Integer> pageTable;
 
+	private int instructionsCounter;
+
 	private Auxiliary aux;
 
 	public CPU(Word[] m, MemoryManager memoryManager) {  
 		this.pc = 0; 
 		this.ir = null;
-		reg = new int[9]; 		// aloca o espaço dos registradores
+		this.reg = new int[9]; 		// aloca o espaço dos registradores
 		this.m = m;		
 		this.memoryManager = memoryManager; // usa o atributo 'm' para acessar a memoria.
 		this.currentProcessId = -1;
 		this.pageTable = null;
+		this.instructionsCounter = 0;
 		this.aux = new Auxiliary(memoryManager);		
 	}
 	
@@ -49,12 +52,18 @@ public class CPU {
 	}
 
 	public PCB unloadPCB(){
+		instructionsCounter = 0;
 		return new PCB(currentProcessId, pc, reg, pageTable);
 	}
 	
 	public void run() { 
 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
-		while (true) { 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
+		while (true) { 	
+			// C = 5;
+			if(instructionsCounter >= 5){
+				break;
+			}		
+			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
 			// FETCH
 			ir = m[memoryManager.translate(pc, pageTable)]; 	// busca posicao da memoria apontada por pc, guarda em ir
@@ -309,6 +318,8 @@ public class CPU {
 				interruptFlag = InterruptTypes.INVALID_INSTRUCTION;
 				break;
 			}
+
+			instructionsCounter++;
 			
 			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
 			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg);		

@@ -21,13 +21,13 @@ public class Auxiliary {
             System.out.print(i); System.out.print(":  ");  dump(m[i]);
         }
     }
-    public void loadToMemory(Word[] p, Word[] m, LinkedList<Integer> pageTable) {
-        for (int i = 0; i < p.length; i++) {
+    public void loadToMemory(Word[] programCode, Word[] m, LinkedList<Integer> pageTable) {
+        for (int i = 0; i < programCode.length; i++) {
             int physicalAddress = memoryManager.translate(i, pageTable);
-            m[physicalAddress].opc = p[i].opc;
-            m[physicalAddress].r1 = p[i].r1;
-            m[physicalAddress].r2 = p[i].r2;
-            m[physicalAddress].p = p[i].p;
+            m[physicalAddress].opc = programCode[i].opc;
+            m[physicalAddress].r1 = programCode[i].r1;
+            m[physicalAddress].r2 = programCode[i].r2;
+            m[physicalAddress].p = programCode[i].p;
         }
     }
 }
