@@ -76,12 +76,16 @@ public class MySystem {
 		boolean createdProcess = processManager.createProcess(vm.m, program);
 		if(!createdProcess){
 			System.out.println("O processo não pôde ser criado!");
+			return;
 		}
+
+		PCB nextProcess = processManager.nextProcess();
+		vm.cpu.loadPCB(nextProcess);
 
 
 		System.out.println("---------------------------------- programa carregado ");
 		aux.dump(vm.m, 0, program.length);
-		// vm.cpu.run();
+		vm.cpu.run();
 		System.out.println("---------------------------------- após execucao ");
 		aux.dump(vm.m, 0, program.length);
 	}

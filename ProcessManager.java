@@ -1,6 +1,4 @@
 import java.util.LinkedList;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class ProcessManager {
 
@@ -28,7 +26,7 @@ public class ProcessManager {
         PCB pcb = new PCB(id, pc, reg, tablePage);
         processList.add(pcb);
 
-        aux.carga(m, program);
+        aux.loadToMemory(program, m, tablePage);
 
         return true;
 
@@ -36,6 +34,10 @@ public class ProcessManager {
 
     public void destroyProcess(int id){
         processList.removeIf((PCB pcb) -> pcb.getId() == id);
+    }
+
+    public PCB nextProcess(){
+        return processList.removeFirst();
     }
     
 }

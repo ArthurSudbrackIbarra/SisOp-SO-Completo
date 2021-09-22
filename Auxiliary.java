@@ -21,9 +21,7 @@ public class Auxiliary {
             System.out.print(i); System.out.print(":  ");  dump(m[i]);
         }
     }
-    public LinkedList<Integer> carga(Word[] p, Word[] m) {
-        LinkedList<Integer> pageTable = memoryManager.alloc(p.length);
-        if(pageTable == null) return null;
+    public void loadToMemory(Word[] p, Word[] m, LinkedList<Integer> pageTable) {
         for (int i = 0; i < p.length; i++) {
             int physicalAddress = memoryManager.translate(i, pageTable);
             m[physicalAddress].opc = p[i].opc;
@@ -31,7 +29,6 @@ public class Auxiliary {
             m[physicalAddress].r2 = p[i].r2;
             m[physicalAddress].p = p[i].p;
         }
-        return pageTable;
     }
 }
 // -------------------------------------------  fim classes e funcoes auxiliares
