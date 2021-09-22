@@ -2,12 +2,13 @@
 // --------------------- C P U  -  definicoes da CPU ----------------------------------------------------- 
 
 public class CPU {
+
+	private MySystem system;
+
 	// característica do processador: contexto da CPU ...
 	private int pc; 			// ... composto de program counter,
 	private Word ir; 			// instruction register,
 	public int[] reg;       	// registradores da CPU
-
-	private MySystem system; // objeto MySystem para se comunicar com o sistema.
 	
 	// Checa se algumas interrupcoes irao ocorrer.
 	private InterruptChecker ic;
@@ -16,16 +17,18 @@ public class CPU {
 	private InterruptHandler ih;
 	
 	public Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
+	private MemoryManager memoryManager;
 	
-	private Auxiliary aux = new Auxiliary();
+	private Auxiliary aux;
 	
-	public CPU(Word[] _m, MySystem system) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
-		m = _m; 				// usa o atributo 'm' para acessar a memoria.
+	public CPU(Word[] m, MySystem system, MemoryManager memoryManager) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
+		this.system = system;
+		this.m = m;		
+		this.memoryManager = memoryManager; // usa o atributo 'm' para acessar a memoria.
+		this.aux = new Auxiliary(memoryManager);		
 		reg = new int[9]; 		// aloca o espaço dos registradores
 		ic = new InterruptChecker(system);
 		ih = new InterruptHandler(system);
-		
-		this.system = system;
 	}
 	
 	public void setContext(int _pc) {  // no futuro esta funcao vai ter que ser 

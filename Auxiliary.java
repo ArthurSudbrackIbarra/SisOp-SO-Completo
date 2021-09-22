@@ -1,5 +1,14 @@
+import java.util.LinkedList;
+
 // -------------------------------------------  classes e funcoes auxiliares
 public class Auxiliary {
+
+    private MemoryManager memoryManager;
+
+    public Auxiliary(MemoryManager memoryManager){ // MemoryManager no construtor
+        this.memoryManager = memoryManager;
+    }
+
     public void dump(Word w) {
         System.out.print("[ "); 
         System.out.print(w.opc); System.out.print(", ");
@@ -12,10 +21,21 @@ public class Auxiliary {
             System.out.print(i); System.out.print(":  ");  dump(m[i]);
         }
     }
-    public void carga(Word[] p, Word[] m) {
+    public boolean carga(Word[] p, Word[] m) {
+
+        LinkedList<Integer> pageTable = memoryManager.alloc(p.length);
+
+        if(pageTable == null) return false;
+
         for (int i = 0; i < p.length; i++) {
-            m[i].opc = p[i].opc;     m[i].r1 = p[i].r1;     m[i].r2 = p[i].r2;     m[i].p = p[i].p;
+            int physicalAddress = memoryManager.translate(i, pageTable);
+            m[physicalAddress].opc = p[i].opc;
+            m[physicalAddress].r1 = p[i].r1;
+            m[physicalAddress].r2 = p[i].r2;
+            m[physicalAddress].p = p[i].p;
         }
+
+        return true;
     }
 }
 // -------------------------------------------  fim classes e funcoes auxiliares
