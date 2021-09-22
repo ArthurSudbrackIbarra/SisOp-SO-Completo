@@ -51,7 +51,7 @@ public class MySystem {
 		vm.cpu.run();
 
 		System.out.println("---------------------------------- após execucao ");
-		aux.dump(vm.m, 0, program.length);
+		aux.dump(vm.m, 0, vm.m.length);
 	}
 
 }
