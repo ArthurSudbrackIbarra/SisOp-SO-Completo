@@ -1,9 +1,18 @@
+import java.util.LinkedList;
+
 // Classe auxiliar responsavel por checar se certas interrupcoes ocorrem.
 public class InterruptChecker {
 
     // Checa se um endereco de memoria e invalido.
-    public static boolean isInvalidAddress(int index, int memorySize){
-        if(index < 0 || index >= memorySize) return true;
+    public static boolean isInvalidAddress(int pc, int memorySize, MemoryManager memoryManager, LinkedList<Integer> pageTable){
+        if(pc < 0 || pc >= memorySize){ // Maior ou menor que memoria fisica.
+            return true;
+        } 
+        // Invade enderecos que nao pertence a pagina
+        int pageOfPc = memoryManager.pageOfPc(pc);
+        if(!pageTable.contains(pageOfPc)){
+            return true;
+        }
         return false;
     }
 

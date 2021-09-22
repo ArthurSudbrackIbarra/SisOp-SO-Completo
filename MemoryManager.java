@@ -55,7 +55,7 @@ public class MemoryManager {
     }
 
     public int translate(int logicAddress, LinkedList<Integer> pageTable){
-        int pageIndex = logicAddress / pageSize;
+        int pageIndex = pageOfPc(logicAddress);
         int offset = logicAddress % pageSize;
         int physicalAddress =  (pageTable.get(pageIndex) * pageSize) + offset;
         return physicalAddress;
@@ -65,6 +65,11 @@ public class MemoryManager {
         for(int i = 0; i < pageTable.size(); i++){
             System.out.println("[" + i + "] " + pageTable.get(i));
         }
+    }
+
+    public int pageOfPc(int logicAddress){
+        int pageIndex = logicAddress / pageSize;
+        return pageIndex;
     }
     
 }

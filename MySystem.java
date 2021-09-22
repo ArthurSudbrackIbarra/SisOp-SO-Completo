@@ -37,10 +37,13 @@ public class MySystem {
 		system.addProgram("PB", Programs.pb);
 		system.addProgram("PC", Programs.pc);
 
+		// Memoria antes da execucao:
+		system.dumpMemory(0, 150);
+
 		system.start();
 
 		// Memoria apos execucao:
-		system.dumpMemory(0, 300);
+		system.dumpMemory(0, 150);
 		
 	}
     // -------------------------------------------------------------------------------------------------------

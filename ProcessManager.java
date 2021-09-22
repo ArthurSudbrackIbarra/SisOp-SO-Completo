@@ -51,7 +51,7 @@ public class ProcessManager {
     public void runAllProcesses(CPU cpu){
         int i = 0;
         while(!processList.isEmpty()){
-            
+
             if(i >= processList.size()){
                 i = 0;
             }
@@ -59,7 +59,7 @@ public class ProcessManager {
             PCB currentProcess = processList.get(i);
             cpu.loadPCB(currentProcess);
 
-            System.out.println("AGORA RODANDO O PROCESSO: " + programNamesMap.get(currentProcess.getId()));
+            System.out.println("\nAGORA RODANDO O PROCESSO: " + programNamesMap.get(currentProcess.getId()) + "\n");
 
             boolean processHasEnded = cpu.run();
             if(processHasEnded){
