@@ -334,7 +334,7 @@ public class CPU {
 			instructionsCounter++;
 			
 			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
-			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg);		
+			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg, memoryManager, pageTable);		
 			if(programShouldEnd){
 				return true;
 			}	

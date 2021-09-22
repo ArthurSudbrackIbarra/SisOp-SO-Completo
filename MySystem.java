@@ -33,9 +33,9 @@ public class MySystem {
 
 		MySystem system = new MySystem();	
 
-		system.addProgram("PA", Programs.pa);
-		system.addProgram("PB", Programs.pb);
-		system.addProgram("PC", Programs.pc);
+		system.addProgram(Programs.pa);
+		system.addProgram(Programs.testIn);
+		system.addProgram(Programs.pc);
 
 		// Memoria antes da execucao:
 		system.dumpMemory(0, 150);
@@ -51,7 +51,7 @@ public class MySystem {
 
 	// -------------------------------------------- teste do sistema ,  veja classe de programas
 
-	public void addProgram(String programName, Program program){
+	public void addProgram(Program program){
 
 		boolean createdProcess = processManager.createProcess(vm.m, program);
 
