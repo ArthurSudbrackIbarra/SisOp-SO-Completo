@@ -56,12 +56,14 @@ public class CPU {
 		return new PCB(currentProcessId, pc, reg, pageTable);
 	}
 	
-	public void run() { 
+	// Este metodo ira retornar false para ProcessManager enquanto ainda houver comandos para rodar.
+	// Este metodo ira retornar true para ProcessManager quando nao houver mais comandos para rodar.
+	public boolean run() { 
 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
 		while (true) { 	
 			// C = 5;
 			if(instructionsCounter >= 5){
-				break;
+				return false;
 			}		
 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
@@ -324,7 +326,7 @@ public class CPU {
 			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
 			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg);		
 			if(programShouldEnd){
-				break;
+				return true;
 			}	
 		}
 	}

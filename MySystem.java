@@ -13,12 +13,13 @@ public class MySystem {
 	public VM vm;
 	private Auxiliary aux;
 
+	private static final int MEMORY_SIZE = 1024;
+	private static final int PAGE_SIZE = 16;
+
 	private ProcessManager processManager;
 
     public MySystem(){   // a VM com tratamento de interrupções
 
-		int MEMORY_SIZE = 1024;
-		int PAGE_SIZE = 16;
 		vm = new VM(MEMORY_SIZE, PAGE_SIZE);
 
 		this.aux = new Auxiliary(vm.memoryManager);
@@ -32,17 +33,22 @@ public class MySystem {
 
 		MySystem system = new MySystem();	
 
-		system.testProgram("PA", Programs.pa);
-		system.testProgram("PB", Programs.pb);
-		system.testProgram("PC", Programs.pc);
+		system.addProgram("PA", Programs.pa);
+		system.addProgram("PB", Programs.pb);
+		system.addProgram("PC", Programs.pc);
 
+		system.start();
+
+		// Memoria apos execucao:
+		system.dumpMemory(0, 300);
+		
 	}
     // -------------------------------------------------------------------------------------------------------
     // --------------- TUDO ABAIXO DE MAIN É AUXILIAR PARA FUNCIONAMENTO DO SISTEMA - nao faz parte 
 
 	// -------------------------------------------- teste do sistema ,  veja classe de programas
 
-	public void testProgram(String programName, Program program){
+	public void addProgram(String programName, Program program){
 
 		boolean createdProcess = processManager.createProcess(vm.m, program);
 
@@ -52,6 +58,14 @@ public class MySystem {
 			System.out.println("O processo para o programa " + program.getName() + " não pôde ser criado!");
 		}
 
+	}
+
+	public void start(){
+		processManager.runAllProcesses(vm.cpu);
+	}
+
+	public void dumpMemory(int start, int end){
+		aux.dump(vm.m, start, end);
 	}
 
 }

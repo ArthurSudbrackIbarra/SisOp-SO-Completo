@@ -7,6 +7,7 @@ public class ProcessManager {
     private MemoryManager memoryManager;
 
     private LinkedList<PCB> processList;
+    private int idCounter;
 
     private HashMap<Integer, String> programNamesMap;
 
@@ -14,6 +15,7 @@ public class ProcessManager {
         this.aux = new Auxiliary(memoryManager);
         this.memoryManager = memoryManager;
         this.processList = new LinkedList<>();
+        this.idCounter = 1;
         this.programNamesMap = new HashMap<>();
     }
 
@@ -25,7 +27,7 @@ public class ProcessManager {
 
         if(tablePage == null) return false;
 
-        int id = processList.size() + 1;
+        int id = idCounter;
         int pc = 0;
         int[] reg = new int[9];
 
@@ -36,6 +38,8 @@ public class ProcessManager {
 
         programNamesMap.put(id, program.getName());
 
+        idCounter++;
+
         return true;
 
     }
@@ -44,12 +48,30 @@ public class ProcessManager {
         processList.removeIf((PCB pcb) -> pcb.getId() == id);
     }
 
-    public PCB nextProcess(){
-        return processList.removeFirst();
-    }
+    public void runAllProcesses(CPU cpu){
+        int i = 0;
+        while(!processList.isEmpty()){
+            
+            if(i >= processList.size()){
+                i = 0;
+            }
 
-    public void runAllProcesses(){
+            PCB currentProcess = processList.get(i);
+            cpu.loadPCB(currentProcess);
 
+            System.out.println("AGORA RODANDO O PROCESSO: " + programNamesMap.get(currentProcess.getId()));
+
+            boolean processHasEnded = cpu.run();
+            if(processHasEnded){
+                destroyProcess(currentProcess.getId());
+                i--;
+            } else {
+                processList.set(i, cpu.unloadPCB());
+            }
+
+            i++;
+
+        }
     }
     
 }
