@@ -1,7 +1,7 @@
 //  -------------------------------------------- programas aa disposicao para copiar na memoria (vide aux.carga)
 public class Programs {
 
-    public Word[] progMinimo = new Word[] {
+    public static Word[] progMinimo = new Word[] {
         //       OPCODE      R1  R2  P         :: VEJA AS COLUNAS VERMELHAS DA TABELA DE DEFINICAO DE OPERACOES
         //                                     :: -1 SIGNIFICA QUE O PARAMETRO NAO EXISTE PARA A OPERACAO DEFINIDA
         new Word(Opcode.LDI, 0, -1, 999), 		
@@ -13,7 +13,7 @@ public class Programs {
         new Word(Opcode.STOP, -1, -1, -1) 
     };
         
-    public Word[] fibonacci10 = new Word[] { // mesmo que prog exemplo, so que usa r0 no lugar de r8
+    public static Word[] fibonacci10 = new Word[] { // mesmo que prog exemplo, so que usa r0 no lugar de r8
         new Word(Opcode.LDI, 1, -1, 0), 
         new Word(Opcode.STD, 1, -1, 20),    // 20 posicao de memoria onde inicia a serie de fibonacci gerada  
         new Word(Opcode.LDI, 2, -1, 1),
@@ -46,7 +46,7 @@ public class Programs {
         new Word(Opcode.DATA, -1, -1, -1)  // ate aqui - serie de fibonacci ficara armazenada
     };   
 
-    public Word[] fatorial = new Word[] { 	 // este fatorial so aceita valores positivos.   nao pode ser zero
+    public static Word[] fatorial = new Word[] { 	 // este fatorial so aceita valores positivos.   nao pode ser zero
         // linha   coment
         new Word(Opcode.LDI, 0, -1, 6),      // 0   	r0 é valor a calcular fatorial
         new Word(Opcode.LDI, 1, -1, 1),      // 1   	r1 é 1 para multiplicar (por r0)
@@ -66,7 +66,7 @@ public class Programs {
     // se o número for menor que zero coloca -1 no início da posição de memória para saída;
     // se for maior que zero este é o número de valores da sequencia de fibonacci a
     // serem escritos em sequencia a partir de uma posição de memória;
-    public Word[] pa = new Word[] {
+    public static Word[] pa = new Word[] {
         new Word(Opcode.LDI, 2, -1, 1), // r2 =  1
         new Word(Opcode.LDI, 3, -1, 1), // r3 = 1
         new Word(Opcode.LDI, 4, -1, 21), // r4 ira percorrer a memoria
@@ -107,7 +107,7 @@ public class Programs {
     
     // PB: dado um inteiro em alguma posição de memória,
     // se for negativo armazena -1 na saída; se for positivo responde o fatorial do número na saída
-    public Word[] pb = new Word[] {
+    public static Word[] pb = new Word[] {
         new Word(Opcode.LDI, 2, -1, 1), // r2 =  1
         new Word(Opcode.LDI, 3, -1, 13), // armazena em r3 o endereco para o laco de repeticao
         new Word(Opcode.LDD, 1, -1, 16), // le da posicao 16 e armazena em r1  
@@ -140,7 +140,7 @@ public class Programs {
     // loop ate que não swap nada
     // passando pelos N valores
     // faz swap de vizinhos se da esquerda maior que da direita
-    public Word[] pc = new Word[] { 
+    public static Word[] pc = new Word[] { 
         //populando na memoria
         // se quiser alterar os 5 valores, basta mudar o k das linhas de LDI, caso adicione alguma linha
         // precisara refatorar o codigo, alterando alguns k's (das linhas onde passamos os pc's) para que o programa nao quebre
@@ -208,7 +208,7 @@ public class Programs {
     };
     
     // Programa para testar a instrucao TRAP com entrada.
-    public Word[] testIn = new Word[]{
+    public static Word[] testIn = new Word[]{
         new Word(Opcode.LDI, 7, -1, 1),
         new Word(Opcode.LDI, 8, -1, 4),
         new Word(Opcode.TRAP, -1, -1, -1),
@@ -218,7 +218,7 @@ public class Programs {
     };
     
     // Programa para testar a instrucao TRAP com saida.
-    public Word[] testOut = new Word[]{
+    public static Word[] testOut = new Word[]{
         new Word(Opcode.LDI, 7, -1, 2),
         new Word(Opcode.LDI, 8, -1, 6),
         new Word(Opcode.LDI, 1, -1, 800),

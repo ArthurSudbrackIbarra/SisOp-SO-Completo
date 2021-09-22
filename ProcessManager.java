@@ -28,6 +28,9 @@ public class ProcessManager {
 
         aux.loadToMemory(program, m, tablePage);
 
+        System.out.println("---------------------------------- programa carregado ");
+		aux.dump(m, 0, m.length);
+
         return true;
 
     }
