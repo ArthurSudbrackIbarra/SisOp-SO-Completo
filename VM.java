@@ -9,7 +9,7 @@ public class VM {
     
     public CPU cpu;    
 
-    public VM(MySystem system, int memorySize, int pageSize){   // vm deve ser configurada com endereço de tratamento de interrupcoes
+    public VM(int memorySize, int pageSize){   // vm deve ser configurada com endereço de tratamento de interrupcoes
         this.memorySize = memorySize;
         this.pageSize = pageSize;
         // memória
@@ -20,7 +20,7 @@ public class VM {
         // gerenciador de memoria
         this.memoryManager = new MemoryManager(memorySize, pageSize);
         // cpu
-        cpu = new CPU(m, system, memoryManager);
+        cpu = new CPU(m, memoryManager);
     }	
 }
 // ------------------- V M  - fim ------------------------------------------------------------------------

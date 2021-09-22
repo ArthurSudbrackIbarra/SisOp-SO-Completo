@@ -3,32 +3,21 @@
 
 public class CPU {
 
-	private MySystem system;
-
 	// característica do processador: contexto da CPU ...
 	private int pc; 			// ... composto de program counter,
 	private Word ir; 			// instruction register,
 	public int[] reg;       	// registradores da CPU
-	
-	// Checa se algumas interrupcoes irao ocorrer.
-	private InterruptChecker ic;
-
-	// Trata as diferentes interrupcoes.
-	private InterruptHandler ih;
 	
 	public Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
 	private MemoryManager memoryManager;
 	
 	private Auxiliary aux;
 	
-	public CPU(Word[] m, MySystem system, MemoryManager memoryManager) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
-		this.system = system;
+	public CPU(Word[] m, MemoryManager memoryManager) {     // ref a MEMORIA e interrupt handler passada na criacao da CPU
 		this.m = m;		
 		this.memoryManager = memoryManager; // usa o atributo 'm' para acessar a memoria.
 		this.aux = new Auxiliary(memoryManager);		
 		reg = new int[9]; 		// aloca o espaço dos registradores
-		ic = new InterruptChecker(system);
-		ih = new InterruptHandler(system);
 	}
 	
 	public void setContext(int _pc) {  // no futuro esta funcao vai ter que ser 
@@ -55,7 +44,7 @@ public class CPU {
 			switch (ir.opc) { // para cada opcode, sua execução
 
 				case LDI: // Rd ← k
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else {
 					reg[ir.r1] = ir.p;
@@ -64,9 +53,9 @@ public class CPU {
 				break;
 
 				case LDD: // Rd ← [A]
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidAddress(ir.p)){
+				} else if (InterruptChecker.isInvalidAddress(ir.p, m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else {
 					reg[ir.r1] = m[ir.p].p;
@@ -75,11 +64,11 @@ public class CPU {
 				break;
 
 				case LDX: // Rd ← [Rs]
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if(ic.isInvalidAddress(reg[ir.r2])){
+				} else if(InterruptChecker.isInvalidAddress(reg[ir.r2], m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else {
 					reg[ir.r1] = m[reg[ir.r2]].p;
@@ -88,9 +77,9 @@ public class CPU {
 				break;
 
 				case STD: // [A] ← Rs
-				if (ic.isInvalidAddress(ir.p)){ 
+				if (InterruptChecker.isInvalidAddress(ir.p, m.length)){ 
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
-				} else if (ic.isInvalidRegister(ir.r1)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else {
 					m[ir.p].opc = Opcode.DATA;
@@ -100,11 +89,11 @@ public class CPU {
 				break;
 
 				case ADD: // Rd ← Rd + Rs
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
+				} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 					interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
 				} else {
 					reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
@@ -113,11 +102,11 @@ public class CPU {
 				break;
 
 				case MULT: // Rd ← Rd * Rs
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER ;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
+				} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
 					interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
 				} else {
 					reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
@@ -126,9 +115,9 @@ public class CPU {
 				break;
 
 				case ADDI: // Rd ← Rd + k
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
+				} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
 					interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
 				} else {
 					reg[ir.r1] = reg[ir.r1] + ir.p;
@@ -137,11 +126,11 @@ public class CPU {
 				break;
 
 				case STX: // [Rd] ←Rs
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidAddress(reg[ir.r1])){
+				} else if (InterruptChecker.isInvalidAddress(reg[ir.r1], m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else {
 					m[reg[ir.r1]].opc = Opcode.DATA;      
@@ -151,11 +140,11 @@ public class CPU {
 				break;
 
 				case SUB: // Rd ← Rd - Rs
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
+				} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
 					interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
 				} else{							
 					reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
@@ -164,9 +153,9 @@ public class CPU {
 				break;
 
 				case SUBI: // Rd ← Rd – k
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
+				} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
 					interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
 				} else {
 					reg[ir.r1] = reg[ir.r1] - ir.p;
@@ -178,7 +167,7 @@ public class CPU {
 				pc = ir.p;
 				break;	
 				case JMPI:
-				if(ic.isInvalidRegister(ir.r1)){
+				if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else {
 					pc = reg[ir.r1];
@@ -186,9 +175,9 @@ public class CPU {
 				break;
 
 				case JMPIG: // If Rc > 0 Then PC ← Rs Else PC ← PC +1
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else if (reg[ir.r2] > 0) {
 					pc = reg[ir.r1];
@@ -198,9 +187,9 @@ public class CPU {
 				break;
 
 				case JMPIL: // if Rc < 0 then PC ← Rs Else PC ← PC +1
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else if(reg[ir.r2] < 0) {
 					pc = reg[ir.r1];
@@ -210,9 +199,9 @@ public class CPU {
 				break;
 
 				case JMPIE: // If Rc = 0 Then PC ← Rs Else PC ← PC +1
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else if (reg[ir.r2] == 0) {
 					pc = reg[ir.r1];
@@ -222,7 +211,7 @@ public class CPU {
 				break;
 
 				case JMPIM: // PC ← [A]
-				if(ic.isInvalidAddress(ir.p)){
+				if(InterruptChecker.isInvalidAddress(ir.p, m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else {
 					pc = m[ir.p].p;
@@ -230,9 +219,9 @@ public class CPU {
 				break;
 
 				case JMPILM: // if Rc < 0 then PC ← [A] Else PC ← PC +1
-				if (ic.isInvalidRegister(ir.r2)){
+				if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidAddress(ir.p)){
+				} else if (InterruptChecker.isInvalidAddress(ir.p, m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else if(reg[ir.r2] < 0) {
 					pc = m[ir.p].p;
@@ -242,9 +231,9 @@ public class CPU {
 				break;
 
 				case JMPIGM: // if Rc > 0 then PC ← [A] Else PC ← PC +1 
-				if (ic.isInvalidRegister(ir.r2)){
+				if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidAddress(ir.p)){
+				} else if (InterruptChecker.isInvalidAddress(ir.p, m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else if(reg[ir.r2] > 0) {
 					pc = m[ir.p].p;
@@ -254,9 +243,9 @@ public class CPU {
 				break;
 
 				case JMPIEM: // if Rc = 0 then PC ← [A] Else PC ← PC +1
-				if (ic.isInvalidRegister(ir.r2)){
+				if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidAddress(ir.p)){
+				} else if (InterruptChecker.isInvalidAddress(ir.p, m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else if(reg[ir.r2] == 0) {
 					pc = m[ir.p].p;
@@ -266,9 +255,9 @@ public class CPU {
 				break;
 
 				case SWAP: // T ← Ra | Ra ← Rb | Rb ←T
-				if (ic.isInvalidRegister(ir.r1)){
+				if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
-				} else if (ic.isInvalidRegister(ir.r2)){
+				} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 					interruptFlag = InterruptTypes.INVALID_REGISTER;
 				} else {
 					int t = reg[ir.r1];
@@ -279,7 +268,7 @@ public class CPU {
 				break;
 
 				case TRAP:
-				if(ic.isInvalidAddress(reg[8])){
+				if(InterruptChecker.isInvalidAddress(reg[8], m.length)){
 					interruptFlag = InterruptTypes.INVALID_ADDRESS;
 				} else {
 					interruptFlag = InterruptTypes.TRAP_INTERRUPT;
@@ -302,7 +291,7 @@ public class CPU {
 			}
 			
 			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
-			boolean programShouldEnd = ih.handle(interruptFlag, pc);		
+			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg);		
 			if(programShouldEnd){
 				break;
 			}	

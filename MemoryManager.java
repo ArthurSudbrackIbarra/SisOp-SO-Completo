@@ -20,6 +20,9 @@ public class MemoryManager {
             frames[i] = true;
         }
         this.framesCount = frames.length;
+
+        // Teste, ocupando para deixar buracos
+        frames[1] = false;
     }
 
     public LinkedList<Integer> alloc(int instructionsNumber){

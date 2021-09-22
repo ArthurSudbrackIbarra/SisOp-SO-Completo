@@ -1,6 +1,3 @@
-import java.util.LinkedList;
-import java.util.Scanner;
-
 /**
  * @author Arthur Sudbrack Ibarra, Luiz Eduardo Mello dos Reis, Willian Magnum Albeche
  */
@@ -16,31 +13,10 @@ public class MySystem {
 	public VM vm;
 
     public MySystem(){   // a VM com tratamento de interrupções
-		int MEMORY_SIZE = 35;
+		int MEMORY_SIZE = 45;
 		int PAGE_SIZE = 5;
-		vm = new VM(this, MEMORY_SIZE, PAGE_SIZE);
+		vm = new VM(MEMORY_SIZE, PAGE_SIZE);
 	}
-	
-	// -------------------------------------------------------------------------------------------------------
-	// -------------------------------------------------------------------------------------------------------
-	// ------------------- S O F T W A R E - inicio ----------------------------------------------------------
-
-	public void trap(){
-		int inOrOut = vm.cpu.reg[7];
-		int address = vm.cpu.reg[8];
-		if(inOrOut == 1){ // IN
-			Scanner scanner = new Scanner(System.in);
-			System.out.print("[CHAMADA DE SISTEMA TRAP] Informe um valor inteiro (IN): ");
-			int value = Integer.parseInt(scanner.nextLine());
-			vm.m[address].opc = Opcode.DATA;
-			vm.m[address].p = value;
-			scanner.close();
-		} else if (inOrOut == 2){ // OUT
-			System.out.println("\n[CHAMADA DE SISTEMA TRAP] [OUTPUT]\n" + vm.m[address].p + "\n");
-		}
-	}
-	
-	// ------------------- S O F T W A R E - fim ----------------------------------------------------------
 	
     // -------------------------------------------------------------------------------------------------------
     // ------------------- instancia e testa sistema
