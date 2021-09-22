@@ -13,6 +13,7 @@ public class CPU {
 	private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
 	private MemoryManager memoryManager;
 
+	private int currentProcessId;
 	private LinkedList<Integer> pageTable;
 
 	private Auxiliary aux;
@@ -23,6 +24,7 @@ public class CPU {
 		reg = new int[9]; 		// aloca o espaço dos registradores
 		this.m = m;		
 		this.memoryManager = memoryManager; // usa o atributo 'm' para acessar a memoria.
+		this.currentProcessId = -1;
 		this.pageTable = null;
 		this.aux = new Auxiliary(memoryManager);		
 	}
@@ -40,9 +42,14 @@ public class CPU {
 	}
 
 	public void loadPCB(PCB pcb){
+		this.currentProcessId = pcb.getId();
 		this.pc = pcb.getPc();
 		this.reg = pcb.getReg();
 		this.pageTable = pcb.getTablePage();
+	}
+
+	public PCB unloadPCB(){
+		return new PCB(currentProcessId, pc, reg, pageTable);
 	}
 	
 	public void run() { 
