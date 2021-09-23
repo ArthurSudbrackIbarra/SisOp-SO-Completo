@@ -2,19 +2,14 @@ import java.util.LinkedList;
 
 public class MemoryManager {
 
-    public int memorySize;
-    public int pageSize;
-
     private boolean[] frames;
     public int framesCount;
 
     // Falta saber quais instrucoes estao em cada frame
 
-    public MemoryManager(int memorySize, int pageSize){
-        this.memorySize = memorySize;
-        this.pageSize = pageSize;
+    public MemoryManager(){
         // frames
-        this.frames = new boolean[(int) Math.ceil((double) memorySize/pageSize)];     
+        this.frames = new boolean[(int) Math.ceil((double) MySystem.MEMORY_SIZE/MySystem.PAGE_SIZE)];     
         // colocando frames como livres
         for(int i = 0; i < frames.length; i++){
             frames[i] = true;
@@ -24,7 +19,7 @@ public class MemoryManager {
 
     public LinkedList<Integer> alloc(int instructionsNumber){
 
-        int framesNeeded = (int) Math.ceil((double) instructionsNumber/pageSize);
+        int framesNeeded = (int) Math.ceil((double) instructionsNumber/MySystem.PAGE_SIZE);
         int framesAllocated = 0;
 
         boolean hasSpace = false;
@@ -56,8 +51,8 @@ public class MemoryManager {
 
     public int translate(int logicAddress, LinkedList<Integer> pageTable){
         int pageIndex = pageOfPc(logicAddress);
-        int offset = logicAddress % pageSize;
-        int physicalAddress =  (pageTable.get(pageIndex) * pageSize) + offset;
+        int offset = logicAddress % MySystem.PAGE_SIZE;
+        int physicalAddress =  (pageTable.get(pageIndex) * MySystem.PAGE_SIZE) + offset;
         return physicalAddress;
     }
 
@@ -68,7 +63,7 @@ public class MemoryManager {
     }
 
     public int pageOfPc(int logicAddress){
-        int pageIndex = logicAddress / pageSize;
+        int pageIndex = logicAddress / MySystem.PAGE_SIZE;
         return pageIndex;
     }
     

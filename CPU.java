@@ -61,12 +61,11 @@ public class CPU {
 	public boolean run() { 
 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
 		while (true) { 	
-			// C = 5;
-			if(instructionsCounter >= 5){
-				return false;
-			}		
 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
+			if(instructionsCounter >= MySystem.MAX_CPU_CYCLES){
+				return false;
+			}	
 			int physicalAddress;
 			// FETCH
 			ir = m[memoryManager.translate(pc, pageTable)]; 	// busca posicao da memoria apontada por pc, guarda em ir
@@ -88,7 +87,7 @@ public class CPU {
 					physicalAddress = memoryManager.translate(ir.p, pageTable);
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						reg[ir.r1] = m[physicalAddress].p;
@@ -102,7 +101,7 @@ public class CPU {
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if(InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					} else if(InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						reg[ir.r1] = m[physicalAddress].p;
@@ -112,7 +111,7 @@ public class CPU {
 
 				case STD: // [A] ← Rs
 					physicalAddress = memoryManager.translate(ir.p, pageTable);
-					if (InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){ 
+					if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){ 
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -164,7 +163,7 @@ public class CPU {
 					physicalAddress = memoryManager.translate(reg[ir.r1], pageTable);
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -248,7 +247,7 @@ public class CPU {
 
 				case JMPIM: // PC ← [A]
 					physicalAddress = memoryManager.translate(ir.p, pageTable);
-					if(InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					if(InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						pc = m[physicalAddress].p;
@@ -259,7 +258,7 @@ public class CPU {
 					physicalAddress = memoryManager.translate(ir.p, pageTable);
 					if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if(reg[ir.r2] < 0) {
 						pc = m[physicalAddress].p;
@@ -272,7 +271,7 @@ public class CPU {
 					physicalAddress = memoryManager.translate(ir.p, pageTable);
 					if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if(reg[ir.r2] > 0) {
 						pc = m[physicalAddress].p;
@@ -285,7 +284,7 @@ public class CPU {
 					physicalAddress = memoryManager.translate(ir.p, pageTable);
 					if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if(reg[ir.r2] == 0) {
 						pc = m[physicalAddress].p;
@@ -309,7 +308,7 @@ public class CPU {
 
 				case TRAP:
 					physicalAddress = memoryManager.translate(reg[8], pageTable);
-					if(InterruptChecker.isInvalidAddress(physicalAddress, m.length, memoryManager, pageTable)){
+					if(InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						interruptFlag = InterruptTypes.TRAP_INTERRUPT;

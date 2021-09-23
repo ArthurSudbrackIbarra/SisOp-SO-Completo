@@ -44,6 +44,10 @@ public class InterruptHandler {
                 }
             return false;
 
+            case CLOCK_INTERRUPT:
+
+            return true;
+
             case END_OF_PROGRAM:
                 System.out.println("Final de programa.");
             return true;

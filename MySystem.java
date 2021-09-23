@@ -13,14 +13,16 @@ public class MySystem {
 	public VM vm;
 	private Auxiliary aux;
 
-	private static final int MEMORY_SIZE = 1024;
-	private static final int PAGE_SIZE = 16;
+	public static final int MEMORY_SIZE = 1024;
+	public static final int PAGE_SIZE = 16;
+
+	public static final int MAX_CPU_CYCLES = 5;
 
 	private ProcessManager processManager;
 
     public MySystem(){   // a VM com tratamento de interrupções
 
-		vm = new VM(MEMORY_SIZE, PAGE_SIZE);
+		vm = new VM();
 
 		this.aux = new Auxiliary(vm.memoryManager);
 		this.processManager = new ProcessManager(vm.memoryManager);
