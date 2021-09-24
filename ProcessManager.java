@@ -3,17 +3,12 @@ import java.util.LinkedList;
 
 public class ProcessManager {
 
-    private Auxiliary aux;
-    private MemoryManager memoryManager;
-
     private LinkedList<PCB> processList;
     private int idCounter;
 
     private HashMap<Integer, String> programNamesMap;
 
-    public ProcessManager(MemoryManager memoryManager){
-        this.aux = new Auxiliary(memoryManager);
-        this.memoryManager = memoryManager;
+    public ProcessManager(){
         this.processList = new LinkedList<>();
         this.idCounter = 1;
         this.programNamesMap = new HashMap<>();
@@ -23,7 +18,7 @@ public class ProcessManager {
 
         Word[] programCode = program.getProgramCode();
 
-        LinkedList<Integer> tablePage = memoryManager.alloc(programCode.length);
+        LinkedList<Integer> tablePage = MemoryManager.alloc(programCode.length);
 
         if(tablePage == null) return false;
 
@@ -34,7 +29,7 @@ public class ProcessManager {
         PCB pcb = new PCB(id, pc, reg, tablePage);
         processList.add(pcb);
 
-        aux.loadToMemory(programCode, m, tablePage);
+        Auxiliary.load(programCode, m, tablePage);
 
         programNamesMap.put(id, program.getName());
 
@@ -49,7 +44,9 @@ public class ProcessManager {
     }
 
     public void runAllProcesses(CPU cpu){
+
         int i = 0;
+
         while(!processList.isEmpty()){
 
             if(i >= processList.size()){
@@ -62,8 +59,10 @@ public class ProcessManager {
             System.out.println("\nAGORA RODANDO O PROCESSO: " + programNamesMap.get(currentProcess.getId()) + "\n");
 
             boolean processHasEnded = cpu.run();
+
             if(processHasEnded){
                 destroyProcess(currentProcess.getId());
+                MemoryManager.desalloc(currentProcess.getTablePage());
                 i--;
             } else {
                 processList.set(i, cpu.unloadPCB());
@@ -72,6 +71,7 @@ public class ProcessManager {
             i++;
 
         }
+
     }
     
 }

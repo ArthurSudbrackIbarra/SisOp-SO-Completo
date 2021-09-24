@@ -4,12 +4,12 @@ import java.util.LinkedList;
 public class InterruptChecker {
 
     // Checa se um endereco de memoria e invalido.
-    public static boolean isInvalidAddress(int pc, MemoryManager memoryManager, LinkedList<Integer> pageTable){
+    public static boolean isInvalidAddress(int pc, LinkedList<Integer> pageTable){
         if(pc < 0 || pc >= MySystem.MEMORY_SIZE){ // Maior ou menor que memoria fisica.
             return true;
         } 
         // Invade enderecos que nao pertence a pagina
-        int pageOfPc = memoryManager.pageOfPc(pc);
+        int pageOfPc = MemoryManager.pageOfPc(pc);
         if(!pageTable.contains(pageOfPc)){
             return true;
         }

@@ -11,7 +11,6 @@
 public class MySystem {
 
 	public VM vm;
-	private Auxiliary aux;
 
 	public static final int MEMORY_SIZE = 1024;
 	public static final int PAGE_SIZE = 16;
@@ -21,12 +20,8 @@ public class MySystem {
 	private ProcessManager processManager;
 
     public MySystem(){   // a VM com tratamento de interrupções
-
 		vm = new VM();
-
-		this.aux = new Auxiliary(vm.memoryManager);
-		this.processManager = new ProcessManager(vm.memoryManager);
-
+		this.processManager = new ProcessManager();
 	}
 	
     // -------------------------------------------------------------------------------------------------------
@@ -40,12 +35,12 @@ public class MySystem {
 		system.addProgram(Programs.pc);
 
 		// Memoria antes da execucao:
-		system.dumpMemory(0, 150);
+		Auxiliary.dump(system.vm.m, 0, 150);
 
 		system.start();
 
 		// Memoria apos execucao:
-		system.dumpMemory(0, 150);
+		Auxiliary.dump(system.vm.m, 0, 150);
 		
 	}
     // -------------------------------------------------------------------------------------------------------
@@ -67,10 +62,6 @@ public class MySystem {
 
 	public void start(){
 		processManager.runAllProcesses(vm.cpu);
-	}
-
-	public void dumpMemory(int start, int end){
-		aux.dump(vm.m, start, end);
 	}
 
 }

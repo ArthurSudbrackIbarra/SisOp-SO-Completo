@@ -11,29 +11,24 @@ public class CPU {
 	private int[] reg;       	// registradores da CPU
 	
 	private Word[] m;   // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. ee sempre a mesma.
-	private MemoryManager memoryManager;
 
 	private int currentProcessId;
 	private LinkedList<Integer> pageTable;
 
 	private int instructionsCounter;
 
-	private Auxiliary aux;
-
-	public CPU(Word[] m, MemoryManager memoryManager) {  
+	public CPU(Word[] m) {  
 		this.pc = 0; 
 		this.ir = null;
 		this.reg = new int[9]; 		// aloca o espaço dos registradores
 		this.m = m;		
-		this.memoryManager = memoryManager; // usa o atributo 'm' para acessar a memoria.
 		this.currentProcessId = -1;
 		this.pageTable = null;
-		this.instructionsCounter = 0;
-		this.aux = new Auxiliary(memoryManager);		
+		this.instructionsCounter = 0;	
 	}
 	
-	public void setContext(int _pc) {  
-		pc = _pc;                                              
+	public void setContext(int pc) {  
+		this.pc = pc;                                             
 	}
 	
 	public void showState(){
@@ -41,7 +36,7 @@ public class CPU {
 		System.out.print("           ");
 		for (int i=0; i<9; i++) { System.out.print("r"+i);   System.out.print(": "+reg[i]+"     "); };  
 		System.out.println("");
-		System.out.print("           ");  aux.dump(ir);
+		System.out.print("           ");  Auxiliary.dump(ir);
 	}
 
 	public void loadPCB(PCB pcb){
@@ -63,14 +58,20 @@ public class CPU {
 		while (true) { 	
 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
+
 			if(instructionsCounter >= MySystem.MAX_CPU_CYCLES){
-				return false;
+				interruptFlag = InterruptTypes.CLOCK_INTERRUPT;
+				return InterruptHandler.handle(interruptFlag, m, reg, pageTable);
 			}	
+
 			int physicalAddress;
+
 			// FETCH
-			ir = m[memoryManager.translate(pc, pageTable)]; 	// busca posicao da memoria apontada por pc, guarda em ir
-			//if debug
+			ir = m[MemoryManager.translate(pc, pageTable)]; 	// busca posicao da memoria apontada por pc, guarda em ir
+
+			// if debug
 			showState();
+			
 			// EXECUTA INSTRUCAO NO ir
 			switch (ir.opc) { // para cada opcode, sua execução
 
@@ -84,10 +85,10 @@ public class CPU {
 				break;
 
 				case LDD: // Rd ← [A]
-					physicalAddress = memoryManager.translate(ir.p, pageTable);
+					physicalAddress = MemoryManager.translate(ir.p, pageTable);
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						reg[ir.r1] = m[physicalAddress].p;
@@ -96,12 +97,12 @@ public class CPU {
 				break;
 
 				case LDX: // Rd ← [Rs]
-					physicalAddress = memoryManager.translate(reg[ir.r2], pageTable);
+					physicalAddress = MemoryManager.translate(reg[ir.r2], pageTable);
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if(InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					} else if(InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						reg[ir.r1] = m[physicalAddress].p;
@@ -110,8 +111,8 @@ public class CPU {
 				break;
 
 				case STD: // [A] ← Rs
-					physicalAddress = memoryManager.translate(ir.p, pageTable);
-					if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){ 
+					physicalAddress = MemoryManager.translate(ir.p, pageTable);
+					if (InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){ 
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if (InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -160,10 +161,10 @@ public class CPU {
 				break;
 
 				case STX: // [Rd] ←Rs
-					physicalAddress = memoryManager.translate(reg[ir.r1], pageTable);
+					physicalAddress = MemoryManager.translate(reg[ir.r1], pageTable);
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
@@ -246,8 +247,8 @@ public class CPU {
 				break;
 
 				case JMPIM: // PC ← [A]
-					physicalAddress = memoryManager.translate(ir.p, pageTable);
-					if(InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					physicalAddress = MemoryManager.translate(ir.p, pageTable);
+					if(InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						pc = m[physicalAddress].p;
@@ -255,10 +256,10 @@ public class CPU {
 				break;
 
 				case JMPILM: // if Rc < 0 then PC ← [A] Else PC ← PC +1
-					physicalAddress = memoryManager.translate(ir.p, pageTable);
+					physicalAddress = MemoryManager.translate(ir.p, pageTable);
 					if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if(reg[ir.r2] < 0) {
 						pc = m[physicalAddress].p;
@@ -268,10 +269,10 @@ public class CPU {
 				break;
 
 				case JMPIGM: // if Rc > 0 then PC ← [A] Else PC ← PC +1 
-					physicalAddress = memoryManager.translate(ir.p, pageTable);
+					physicalAddress = MemoryManager.translate(ir.p, pageTable);
 					if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if(reg[ir.r2] > 0) {
 						pc = m[physicalAddress].p;
@@ -281,10 +282,10 @@ public class CPU {
 				break;
 
 				case JMPIEM: // if Rc = 0 then PC ← [A] Else PC ← PC +1
-					physicalAddress = memoryManager.translate(ir.p, pageTable);
+					physicalAddress = MemoryManager.translate(ir.p, pageTable);
 					if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					} else if (InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else if(reg[ir.r2] == 0) {
 						pc = m[physicalAddress].p;
@@ -307,8 +308,8 @@ public class CPU {
 				break;
 
 				case TRAP:
-					physicalAddress = memoryManager.translate(reg[8], pageTable);
-					if(InterruptChecker.isInvalidAddress(physicalAddress, memoryManager, pageTable)){
+					physicalAddress = MemoryManager.translate(reg[8], pageTable);
+					if(InterruptChecker.isInvalidAddress(physicalAddress, pageTable)){
 						interruptFlag = InterruptTypes.INVALID_ADDRESS;
 					} else {
 						interruptFlag = InterruptTypes.TRAP_INTERRUPT;
@@ -333,7 +334,7 @@ public class CPU {
 			instructionsCounter++;
 			
 			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
-			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg, memoryManager, pageTable);		
+			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg, pageTable);		
 			if(programShouldEnd){
 				return true;
 			}	
