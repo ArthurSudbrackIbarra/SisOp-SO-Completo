@@ -21,8 +21,8 @@ public class InterruptHandler {
                 System.out.println("Instrucao invalida: a instrucao carregada é invalida.");
             return true;
 
-            case MATHEMATICAL_OVERFLOW:
-                System.out.println("Overflow em operacao matematica.");
+            case OVERFLOW:
+                System.out.println("Overflow de numero inteiro.");
             return true;
 
             case INVALID_REGISTER:
@@ -36,9 +36,12 @@ public class InterruptHandler {
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("[CHAMADA DE SISTEMA TRAP] Informe um valor inteiro (IN): ");      
                     int value = Integer.parseInt(scanner.nextLine());
-                    m[physicalAddress].opc = Opcode.DATA;
-                    m[physicalAddress].p = value;
                     scanner.close();
+                    if(InterruptChecker.causesOverflow(value, -1, InterruptChecker.SOLE_NUMBER)){
+                        return handle(InterruptTypes.OVERFLOW, m, reg, pageTable);
+                    }
+                    m[physicalAddress].opc = Opcode.DATA;
+                    m[physicalAddress].p = value;                
                 } else if (inOrOut == 2){ // OUT
                     System.out.println("\n[CHAMADA DE SISTEMA TRAP] [OUTPUT]\n" + m[physicalAddress].p + "\n");
                 }

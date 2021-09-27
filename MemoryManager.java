@@ -52,15 +52,15 @@ public class MemoryManager {
         return physicalAddress;
     }
 
+    public static int pageOfPc(int logicAddress){
+        int pageIndex = logicAddress / MySystem.PAGE_SIZE;
+        return pageIndex;
+    }
+
     public static void printPageTable(LinkedList<Integer> pageTable){
         for(int i = 0; i < pageTable.size(); i++){
             System.out.println("[" + i + "] " + pageTable.get(i));
         }
-    }
-
-    public static int pageOfPc(int logicAddress){
-        int pageIndex = logicAddress / MySystem.PAGE_SIZE;
-        return pageIndex;
     }
     
 }

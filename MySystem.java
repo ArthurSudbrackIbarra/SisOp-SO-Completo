@@ -12,16 +12,16 @@ public class MySystem {
 
 	public VM vm;
 
-	public static final int MEMORY_SIZE = 1024;
-	public static final int PAGE_SIZE = 16;
+	public static final int MAX_INTEGER_SIZE = 32767;
+	public static final int MIN_INTEGER_SIZE = -32768;
 
-	public static final int MAX_CPU_CYCLES = 5;
+	public static final int MEMORY_SIZE = 110;
+	public static final int PAGE_SIZE = 2;
 
-	private ProcessManager processManager;
+	public static final int MAX_CPU_CYCLES = 10;
 
     public MySystem(){   // a VM com tratamento de interrupções
 		vm = new VM();
-		this.processManager = new ProcessManager();
 	}
 	
     // -------------------------------------------------------------------------------------------------------
@@ -32,15 +32,15 @@ public class MySystem {
 
 		system.addProgram(Programs.pa);
 		system.addProgram(Programs.testIn);
-		system.addProgram(Programs.pc);
+		system.addProgram(Programs.pb);
 
 		// Memoria antes da execucao:
-		Auxiliary.dump(system.vm.m, 0, 150);
+		Auxiliary.dump(system.vm.m, 0, MEMORY_SIZE);
 
 		system.start();
 
 		// Memoria apos execucao:
-		Auxiliary.dump(system.vm.m, 0, 150);
+		Auxiliary.dump(system.vm.m, 0, MEMORY_SIZE);
 		
 	}
     // -------------------------------------------------------------------------------------------------------
@@ -50,18 +50,18 @@ public class MySystem {
 
 	public void addProgram(Program program){
 
-		boolean createdProcess = processManager.createProcess(vm.m, program);
+		boolean createdProcess = vm.processManager.createProcess(vm.m, program);
 
 		if(createdProcess){
 			System.out.println("O processo para o programa " + program.getName() + " foi adicionado a fila com sucesso!");
 		} else {
-			System.out.println("O processo para o programa " + program.getName() + " não pôde ser criado!");
+			System.out.println("O processo para o programa " + program.getName() + " não pôde ser criado! (Falta de memória).");
 		}
 
 	}
 
 	public void start(){
-		processManager.runAllProcesses(vm.cpu);
+		vm.processManager.runAllProcesses(vm.cpu);
 	}
 
 }

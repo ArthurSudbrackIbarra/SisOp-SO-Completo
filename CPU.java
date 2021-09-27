@@ -15,8 +15,6 @@ public class CPU {
 	private int currentProcessId;
 	private LinkedList<Integer> pageTable;
 
-	private int instructionsCounter;
-
 	public CPU(Word[] m) {  
 		this.pc = 0; 
 		this.ir = null;
@@ -24,7 +22,6 @@ public class CPU {
 		this.m = m;		
 		this.currentProcessId = -1;
 		this.pageTable = null;
-		this.instructionsCounter = 0;	
 	}
 	
 	public void setContext(int pc) {  
@@ -47,27 +44,26 @@ public class CPU {
 	}
 
 	public PCB unloadPCB(){
-		instructionsCounter = 0;
 		return new PCB(currentProcessId, pc, reg, pageTable);
 	}
 	
 	// Este metodo ira retornar false para ProcessManager enquanto ainda houver comandos para rodar.
 	// Este metodo ira retornar true para ProcessManager quando nao houver mais comandos para rodar.
 	public boolean run() { 
+
+		int instructionsCounter = 0;
+		InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
+
 		// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente setado
-		while (true) { 	
+		while (instructionsCounter < MySystem.MAX_CPU_CYCLES) { 
+
 			// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
-			InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
 
-			if(instructionsCounter >= MySystem.MAX_CPU_CYCLES){
-				interruptFlag = InterruptTypes.CLOCK_INTERRUPT;
-				return InterruptHandler.handle(interruptFlag, m, reg, pageTable);
-			}	
-
-			int physicalAddress;
+			instructionsCounter++;
 
 			// FETCH
 			ir = m[MemoryManager.translate(pc, pageTable)]; 	// busca posicao da memoria apontada por pc, guarda em ir
+			int physicalAddress;
 
 			// if debug
 			showState();
@@ -128,8 +124,8 @@ public class CPU {
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
-						interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
+					} else if (InterruptChecker.causesOverflow(reg[ir.r1], reg[ir.r2], InterruptChecker.SUM)){
+						interruptFlag = InterruptTypes.OVERFLOW;
 					} else {
 						reg[ir.r1] = reg[ir.r1] + reg[ir.r2];
 					}
@@ -141,8 +137,8 @@ public class CPU {
 						interruptFlag = InterruptTypes.INVALID_REGISTER ;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 3)){
-						interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
+					} else if (InterruptChecker.causesOverflow(reg[ir.r1], reg[ir.r2], InterruptChecker.MULTIPLICATION)){
+						interruptFlag = InterruptTypes.OVERFLOW;
 					} else {
 						reg[ir.r1] = reg[ir.r1] * reg[ir.r2];
 					}
@@ -152,8 +148,8 @@ public class CPU {
 				case ADDI: // Rd ← Rd + k
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
-						interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
+					} else if (InterruptChecker.causesOverflow(reg[ir.r1], ir.p, InterruptChecker.SUM)){
+						interruptFlag = InterruptTypes.OVERFLOW;
 					} else {
 						reg[ir.r1] = reg[ir.r1] + ir.p;
 					}
@@ -180,8 +176,8 @@ public class CPU {
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
 					} else if (InterruptChecker.isInvalidRegister(ir.r2, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], reg[ir.r2], 1)){
-						interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
+					} else if (InterruptChecker.causesOverflow(reg[ir.r1], reg[ir.r2], InterruptChecker.SUBTRACTION)){
+						interruptFlag = InterruptTypes.OVERFLOW;
 					} else{							
 						reg[ir.r1] = reg[ir.r1] - reg[ir.r2];
 					}
@@ -191,8 +187,8 @@ public class CPU {
 				case SUBI: // Rd ← Rd – k
 					if(InterruptChecker.isInvalidRegister(ir.r1, reg.length)){
 						interruptFlag = InterruptTypes.INVALID_REGISTER;
-					} else if (InterruptChecker.causesMathematicalOverflow(reg[ir.r1], ir.p, 3)){
-						interruptFlag = InterruptTypes.MATHEMATICAL_OVERFLOW;
+					} else if (InterruptChecker.causesOverflow(reg[ir.r1], ir.p, InterruptChecker.SUBTRACTION)){
+						interruptFlag = InterruptTypes.OVERFLOW;
 					} else {
 						reg[ir.r1] = reg[ir.r1] - ir.p;
 					}
@@ -318,7 +314,7 @@ public class CPU {
 				break;
 
 				case STOP: // Para a execucao
-				interruptFlag = InterruptTypes.END_OF_PROGRAM;
+					interruptFlag = InterruptTypes.END_OF_PROGRAM;
 				break;
 
 				case DATA:
@@ -327,11 +323,9 @@ public class CPU {
 				
 				// Instrucao invalida
 				default:
-				interruptFlag = InterruptTypes.INVALID_INSTRUCTION;
+					interruptFlag = InterruptTypes.INVALID_INSTRUCTION;
 				break;
 			}
-
-			instructionsCounter++;
 			
 			// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
 			boolean programShouldEnd = InterruptHandler.handle(interruptFlag, m, reg, pageTable);		
@@ -339,6 +333,9 @@ public class CPU {
 				return true;
 			}	
 		}
+		// INTERRUPÇÃO DE CLOCK
+		interruptFlag = InterruptTypes.CLOCK_INTERRUPT;
+		return InterruptHandler.handle(interruptFlag, m, reg, pageTable);	
 	}
 }
 // ------------------ C P U - fim ------------------------------------------------------------------------

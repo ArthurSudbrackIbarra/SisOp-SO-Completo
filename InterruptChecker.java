@@ -23,23 +23,31 @@ public class InterruptChecker {
     }
 
     // Checa se uma operacao matematica de soma, subtracao ou multiplicacao causa
-    // overflow de numero inteiro.
-    public static boolean causesMathematicalOverflow(int a, int b, int operation){
-        long result;
+    // overflow de numero inteiro ou se um numero inteiro informado e maior do que
+    // o maximo permitido pelo sistema.
+
+    public static final int SUM = 1;
+    public static final int SUBTRACTION = 2;
+    public static final int MULTIPLICATION = 3;
+    public static final int SOLE_NUMBER = 4;
+
+    public static boolean causesOverflow(int a, int b, int operation){
+        int result;
         switch (operation) {
-            case 1:
-                result = (long) a + (long) b;
+            case SUM:
+                result = a + b;
             break;
-            case 2:
-                result = (long) a - (long) b;
+            case SUBTRACTION:
+                result = a - b;
             break;
-            case 3:
-                result = (long) a * (long) b;
+            case MULTIPLICATION:
+                result = a * b;
             break;
+            case SOLE_NUMBER:
+                return a > MySystem.MAX_INTEGER_SIZE || a < MySystem.MIN_INTEGER_SIZE;
             default:
                 return true;
         }
-        if(result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) return true;
-        return false;
+        return result > MySystem.MAX_INTEGER_SIZE || result < MySystem.MIN_INTEGER_SIZE;
     }
 }

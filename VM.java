@@ -5,6 +5,8 @@ public class VM {
     public Word[] m;      
     public CPU cpu;    
 
+    public ProcessManager processManager;
+
     public VM(){
         // memória
         this.m = new Word[MySystem.MEMORY_SIZE]; // m ee a memoria
@@ -13,6 +15,8 @@ public class VM {
         };
         // cpu
         cpu = new CPU(m);
+        // gerenciador de processos
+        this.processManager = new ProcessManager();
     }	
 }
 // ------------------- V M  - fim ------------------------------------------------------------------------
