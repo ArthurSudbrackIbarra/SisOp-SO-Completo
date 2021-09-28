@@ -20,8 +20,8 @@ public class MySystem {
 
 	public static final int MAX_CPU_CYCLES = 10;
 
-    public MySystem(){   // a VM com tratamento de interrupções
-		vm = new VM();
+    public MySystem(){   
+		vm = new VM(); // a VM com tratamento de interrupções
 	}
 	
     // -------------------------------------------------------------------------------------------------------
@@ -31,8 +31,8 @@ public class MySystem {
 		MySystem system = new MySystem();	
 
 		system.addProgram(Programs.pa);
-		system.addProgram(Programs.testIn);
 		system.addProgram(Programs.pb);
+		system.addProgram(Programs.testIn);
 
 		// Memoria antes da execucao:
 		Auxiliary.dump(system.vm.m, 0, MEMORY_SIZE);
@@ -43,10 +43,6 @@ public class MySystem {
 		Auxiliary.dump(system.vm.m, 0, MEMORY_SIZE);
 		
 	}
-    // -------------------------------------------------------------------------------------------------------
-    // --------------- TUDO ABAIXO DE MAIN É AUXILIAR PARA FUNCIONAMENTO DO SISTEMA - nao faz parte 
-
-	// -------------------------------------------- teste do sistema ,  veja classe de programas
 
 	public void addProgram(Program program){
 

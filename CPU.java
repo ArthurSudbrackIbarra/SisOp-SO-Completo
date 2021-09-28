@@ -39,8 +39,8 @@ public class CPU {
 	public void loadPCB(PCB pcb){
 		this.currentProcessId = pcb.getId();
 		this.pc = pcb.getPc();
-		this.reg = pcb.getReg();
-		this.pageTable = pcb.getTablePage();
+		this.reg = pcb.getReg().clone();
+		this.pageTable = new LinkedList<Integer>(pcb.getTablePage());
 	}
 
 	public PCB unloadPCB(){
