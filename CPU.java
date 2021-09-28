@@ -44,7 +44,7 @@ public class CPU {
 	}
 
 	public PCB unloadPCB(){
-		return new PCB(currentProcessId, pc, reg, pageTable);
+		return new PCB(currentProcessId, pc, reg.clone(), new LinkedList<Integer>(pageTable));
 	}
 	
 	// Este metodo ira retornar false para ProcessManager enquanto ainda houver comandos para rodar.
