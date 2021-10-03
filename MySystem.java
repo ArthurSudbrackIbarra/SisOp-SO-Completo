@@ -16,7 +16,7 @@ public class MySystem {
 	public static final int MIN_INTEGER_SIZE = -32768;
 
 	public static final int MEMORY_SIZE = 110;
-	public static final int PAGE_SIZE = 2;
+	public static final int PAGE_SIZE = 10;
 
 	public static final int MAX_CPU_CYCLES = 10;
 
