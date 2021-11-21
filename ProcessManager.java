@@ -38,7 +38,7 @@ public class ProcessManager {
 
         // Libera dispatcher se nao tem processo rodando.
         if (RUNNING == null) {
-            Dispatcher.SEMA_DISPATCHER.notify();
+            Dispatcher.SEMA_DISPATCHER.release();
         }
 
         return true;

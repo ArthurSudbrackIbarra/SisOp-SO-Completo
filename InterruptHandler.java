@@ -18,30 +18,37 @@ public class InterruptHandler {
         case INVALID_ADDRESS:
             System.out.println("Endereco invalido: programa do usuario acessando endereço fora de limites permitidos.");
             endProcess();
+            break;
 
         case INVALID_INSTRUCTION:
             System.out.println("Instrucao invalida: a instrucao carregada é invalida.");
             endProcess();
+            break;
 
         case OVERFLOW:
             System.out.println("Overflow de numero inteiro.");
             endProcess();
+            break;
 
         case INVALID_REGISTER:
             System.out.println("Registrador(es) invalido(s) passados como parametro.");
             endProcess();
+            break;
 
         case TRAP_INTERRUPT:
             System.out.println("Chamada de sistema [TRAP].");
             packageForConsole();
+            break;
 
         case CLOCK_INTERRUPT:
             System.out.println("Ciclo maximo de CPU atingido (" + MySystem.MAX_CPU_CYCLES + ").");
             saveProcess();
+            break;
 
         case END_OF_PROGRAM:
             System.out.println("Final de programa.\n");
             endProcess();
+            break;
 
         default:
             return;
@@ -54,6 +61,8 @@ public class InterruptHandler {
             ProcessManager.destroyProcess(ProcessManager.RUNNING.getId());
             ProcessManager.RUNNING = null;
         }
+        // Resetando interruptFlag da CPU.
+        cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera escalonador.
         Dispatcher.SEMA_DISPATCHER.release();
     }
@@ -64,6 +73,8 @@ public class InterruptHandler {
         PCB process = cpu.unloadPCB();
         // Coloca na fila de prontos.
         ProcessManager.READY_LIST.add(process);
+        // Resetando interruptFlag da CPU.
+        cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera escalonador.
         Dispatcher.SEMA_DISPATCHER.release();
     }
@@ -74,6 +85,8 @@ public class InterruptHandler {
         // Coloca na lista de bloqueados.
         ProcessManager.BLOCKED_LIST.add(process);
         // Libera escalonador.
+        // Resetando interruptFlag da CPU.
+        cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         Dispatcher.SEMA_DISPATCHER.release();
     }
 }

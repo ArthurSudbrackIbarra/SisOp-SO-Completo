@@ -16,12 +16,15 @@ public class Dispatcher extends Thread {
             try {
                 // Espera processo pronto.
                 SEMA_DISPATCHER.acquire();
-                PCB nextProccess = ProcessManager.READY_LIST.get(0);
-                ProcessManager.READY_LIST.remove(0);
-                ProcessManager.RUNNING = nextProccess;
-                cpu.loadPCB(nextProccess);
-                // CPU liberada.
-                cpu.SEMA_CPU.release();
+                if (ProcessManager.READY_LIST.size() > 0) {
+                    System.out.println("Iniciando/Trocando processo.");
+                    PCB nextProccess = ProcessManager.READY_LIST.get(0);
+                    ProcessManager.READY_LIST.remove(0);
+                    ProcessManager.RUNNING = nextProccess;
+                    cpu.loadPCB(nextProccess);
+                    // CPU liberada.
+                    cpu.SEMA_CPU.release();
+                }
             } catch (InterruptedException error) {
                 error.printStackTrace();
             }
