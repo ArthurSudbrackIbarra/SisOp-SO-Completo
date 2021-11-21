@@ -9,24 +9,27 @@ public class PCB {
 
     private LinkedList<Integer> tablePage;
 
-    public PCB(int id, int pc, int[] reg, LinkedList<Integer> tablePage){
+    public PCB(int id, int pc, int[] reg, LinkedList<Integer> tablePage) {
         this.id = id;
         this.pc = pc;
         this.reg = reg;
         this.tablePage = tablePage;
     }
 
-    public int getId(){
+    public int getId() {
         return id;
     }
-    public int getPc(){
+
+    public int getPc() {
         return pc;
     }
-    public int[] getReg(){
+
+    public int[] getReg() {
         return reg;
     }
-    public LinkedList<Integer> getTablePage(){
+
+    public LinkedList<Integer> getTablePage() {
         return tablePage;
     }
-    
+
 }
