@@ -38,15 +38,22 @@ public class ProcessManager {
 
         // Libera dispatcher se nao tem processo rodando.
         if (RUNNING == null) {
-            Dispatcher.SEMA_DISPATCHER.release();
+            Dispatcher.SEMA_DISPATCHER.notify();
         }
 
         return true;
 
     }
 
-    public void destroyProcess(int id) {
-        READY_LIST.removeIf((PCB pcb) -> pcb.getId() == id);
+    public static void destroyProcess(int id) {
+        for (int i = 0; i < READY_LIST.size(); i++) {
+            PCB process = READY_LIST.get(i);
+            if (process.getId() == id) {
+                MemoryManager.dealloc(process.getTablePage());
+                READY_LIST.remove(i);
+                break;
+            }
+        }
     }
 
 }

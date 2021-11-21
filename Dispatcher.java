@@ -20,6 +20,7 @@ public class Dispatcher extends Thread {
                 ProcessManager.READY_LIST.remove(0);
                 ProcessManager.RUNNING = nextProccess;
                 cpu.loadPCB(nextProccess);
+                // CPU liberada.
                 cpu.SEMA_CPU.release();
             } catch (InterruptedException error) {
                 error.printStackTrace();

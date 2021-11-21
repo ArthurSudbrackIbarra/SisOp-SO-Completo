@@ -19,6 +19,7 @@ public class CPU extends Thread {
 	private int currentProcessId;
 	private LinkedList<Integer> pageTable;
 
+	private InterruptTypes interruptFlag;
 	private InterruptHandler interruptHandler;
 
 	public CPU(Word[] m) {
@@ -28,6 +29,7 @@ public class CPU extends Thread {
 		this.m = m;
 		this.currentProcessId = -1;
 		this.pageTable = null;
+		this.interruptFlag = InterruptTypes.NO_INTERRUPT;
 		this.interruptHandler = new InterruptHandler(this);
 	}
 
@@ -45,6 +47,14 @@ public class CPU extends Thread {
 
 	public LinkedList<Integer> getPageTable() {
 		return pageTable;
+	}
+
+	public InterruptTypes getInterruptFlag() {
+		return interruptFlag;
+	}
+
+	public void setInterruptFlag(InterruptTypes interruptFlag) {
+		this.interruptFlag = interruptFlag;
 	}
 
 	public void setContext(int pc) {
@@ -86,11 +96,10 @@ public class CPU extends Thread {
 				SEMA_CPU.acquire();
 
 				int instructionsCounter = 0;
-				InterruptTypes interruptFlag = InterruptTypes.NO_INTERRUPT;
 
 				// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente
 				// setado
-				while (instructionsCounter < MySystem.MAX_CPU_CYCLES) {
+				while (true) {
 
 					// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 
@@ -365,12 +374,20 @@ public class CPU extends Thread {
 						break;
 					}
 
-					// VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
-					interruptHandler.handle(interruptFlag);
+					// Testa interrupcao de clock.
+					if (instructionsCounter == MySystem.MAX_CPU_CYCLES) {
+						interruptFlag = InterruptTypes.CLOCK_INTERRUPT;
+					}
+
+					// Segue o loop se nao houve interrupcao.
+					if (interruptFlag == InterruptTypes.NO_INTERRUPT) {
+						continue;
+					}
+
+					// Houve interrupcao, deve ser tratada (fora do loop).
+					break;
 				}
-				// INTERRUPÇÃO DE CLOCK
-				interruptFlag = InterruptTypes.CLOCK_INTERRUPT;
-				interruptHandler.handle(interruptFlag);
+				interruptHandler.handle();
 			} catch (InterruptedException error) {
 				error.printStackTrace();
 			}
