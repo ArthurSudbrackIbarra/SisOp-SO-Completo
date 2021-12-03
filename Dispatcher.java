@@ -17,7 +17,7 @@ public class Dispatcher extends Thread {
                 // Espera processo pronto.
                 SEMA_DISPATCHER.acquire();
                 if (ProcessManager.READY_LIST.size() > 0) {
-                    System.out.println("Iniciando/Trocando processo.");
+                    System.out.println("\nIniciando/Trocando processo.");
                     PCB nextProccess = ProcessManager.READY_LIST.remove(0);
                     ProcessManager.RUNNING = nextProccess;
                     cpu.loadPCB(nextProccess);

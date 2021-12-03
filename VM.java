@@ -7,6 +7,7 @@ public class VM {
 
     public ProcessManager processManager;
     public Dispatcher dispatcher;
+    public Console console;
 
     public VM() {
 
@@ -25,17 +26,21 @@ public class VM {
         // Escalonador
         this.dispatcher = new Dispatcher(cpu);
 
+        // Console
+        this.console = new Console(cpu);
+
     }
 
     public void startTest() {
         cpu.start();
         dispatcher.start();
+        console.start();
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
         }
+        processManager.createProcess(m, Programs.testIn);
         processManager.createProcess(m, Programs.pa);
-        processManager.createProcess(m, Programs.pb);
     }
 }
 // ------------------- V M - fim

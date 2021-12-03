@@ -37,7 +37,7 @@ public class ProcessManager {
         idCounter++;
 
         // Libera dispatcher se nao tem processo rodando.
-        if (RUNNING == null) {
+        if (READY_LIST.size() == 1) {
             Dispatcher.SEMA_DISPATCHER.release();
         }
 

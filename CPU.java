@@ -407,9 +407,9 @@ public class CPU extends Thread {
 						if (finishedIO) {
 							this.interruptFlag = InterruptTypes.IO_FINISHED;
 							interruptHandler.handle();
-						} else {
-							continue;
+							instructionsCounter = 0;
 						}
+						continue;
 					}
 
 					// Houve interrupcao, deve ser tratada (fora do loop).
