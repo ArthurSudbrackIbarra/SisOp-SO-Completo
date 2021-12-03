@@ -41,6 +41,9 @@ public class Console extends Thread {
         cpu.setCurrentIORequest(ioRequest);
         // Interrompe CPU.
         cpu.setFinishedIO(true);
+        if (ProcessManager.READY_LIST.size() <= 0) {
+            cpu.SEMA_CPU.release();
+        }
     }
 
     private void write(IORequest ioRequest) {
@@ -54,6 +57,9 @@ public class Console extends Thread {
         cpu.setCurrentIORequest(ioRequest);
         // Interrompe CPU.
         cpu.setFinishedIO(true);
+        if (ProcessManager.READY_LIST.size() <= 0) {
+            cpu.SEMA_CPU.release();
+        }
     }
 
 }

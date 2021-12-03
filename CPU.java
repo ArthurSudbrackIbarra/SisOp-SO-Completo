@@ -397,8 +397,10 @@ public class CPU extends Thread {
 					}
 
 					// Testa interrupcao de clock.
-					if (instructionsCounter == MySystem.MAX_CPU_CYCLES) {
+					if (interruptFlag == InterruptTypes.NO_INTERRUPT
+							&& instructionsCounter == MySystem.MAX_CPU_CYCLES) {
 						interruptFlag = InterruptTypes.CLOCK_INTERRUPT;
+						break;
 					}
 
 					// Segue o loop se nao houve interrupcao.
@@ -415,6 +417,7 @@ public class CPU extends Thread {
 					// Houve interrupcao, deve ser tratada (fora do loop).
 					break;
 				}
+				// Trata interrupção.
 				interruptHandler.handle();
 			} catch (InterruptedException error) {
 				error.printStackTrace();

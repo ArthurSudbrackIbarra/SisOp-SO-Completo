@@ -47,6 +47,7 @@ public class InterruptHandler {
                 break;
 
             case IO_FINISHED:
+                System.out.println("Operação IO de processo concluída.");
                 ioFinishedRoutine();
                 break;
 
@@ -129,7 +130,7 @@ public class InterruptHandler {
             cpu.m[physicalAddress].opc = Opcode.DATA;
             cpu.m[physicalAddress].p = ioRequestValue;
         } else {
-            System.out.println("\n[OUTPUT FROM PROCESS " + ioProcess.getId() + "] -" + ioRequestValue + "\n");
+            System.out.println("\n[OUTPUT FROM PROCESS " + ioProcess.getId() + "] " + ioRequestValue + "\n");
         }
     }
 }
