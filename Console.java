@@ -21,9 +21,9 @@ public class Console extends Thread {
                 // Entrou algum processo bloqueado.
                 IORequest ioRequest = ProcessManager.BLOCKED_LIST.remove(0);
                 if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
-                    read(ioRequest.getProcess());
+                    read(ioRequest);
                 } else {
-                    write(ioRequest.getProcess());
+                    write(ioRequest);
                 }
             } catch (InterruptedException error) {
                 error.printStackTrace();
@@ -31,23 +31,29 @@ public class Console extends Thread {
         }
     }
 
-    public void read(PCB process) {
-        System.out.println("[Processo " + process.getId() + " - READ]");
+    private void read(IORequest ioRequest) {
+        System.out.println("[Processo " + ioRequest.getProcess().getId() + " - READ]");
         System.out.print("Input: ");
         int input = Integer.parseInt(reader.nextLine());
-        // Informa o valor à CPU.
-        cpu.setIORequestValue(input);
+        // Informa o valor IO à CPU.
+        cpu.setCurrentIORequestValue(input);
+        // Informa o processo que pediu IO à CPU.
+        cpu.setCurrentIORequest(ioRequest);
         // Interrompe CPU.
-        cpu.setInterruptFlag(InterruptTypes.IO_FINISHED);
+        cpu.setFinishedIO(true);
     }
 
-    public void write(PCB process) {
+    private void write(IORequest ioRequest) {
+        PCB process = ioRequest.getProcess();
         System.out.println("[Processo " + process.getId() + " - WRITE]");
-        int output = process.getReg()[8];
-        // Informa o valor à CPU.
-        cpu.setIORequestValue(output);
+        int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getTablePage());
+        int output = cpu.m[physicalAddress].p;
+        // Informa o valor IO à CPU.
+        cpu.setCurrentIORequestValue(output);
+        // Informa o processo que pediu IO à CPU.
+        cpu.setCurrentIORequest(ioRequest);
         // Interrompe CPU.
-        cpu.setInterruptFlag(InterruptTypes.IO_FINISHED);
+        cpu.setFinishedIO(true);
     }
 
 }

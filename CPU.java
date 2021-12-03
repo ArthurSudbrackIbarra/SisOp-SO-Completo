@@ -13,7 +13,7 @@ public class CPU extends Thread {
 	private Word ir; // instruction register,
 	private int[] reg; // registradores da CPU
 
-	private Word[] m; // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. e sempre a
+	public Word[] m; // CPU acessa MEMORIA, guarda referencia 'm' a ela. memoria nao muda. e sempre a
 						// mesma.
 
 	private int currentProcessId;
@@ -22,7 +22,9 @@ public class CPU extends Thread {
 	private InterruptTypes interruptFlag;
 	private InterruptHandler interruptHandler;
 
-	private int ioRequestValue;
+	private IORequest currentIORequest;
+	private int currentIORequestValue;
+	private boolean finishedIO;
 
 	public CPU(Word[] m) {
 		this.pc = 0;
@@ -33,7 +35,9 @@ public class CPU extends Thread {
 		this.pageTable = null;
 		this.interruptFlag = InterruptTypes.NO_INTERRUPT;
 		this.interruptHandler = new InterruptHandler(this);
-		this.ioRequestValue = -1;
+		this.currentIORequest = null;
+		this.currentIORequestValue = -1;
+		this.finishedIO = false;
 	}
 
 	public int getPC() {
@@ -56,8 +60,12 @@ public class CPU extends Thread {
 		return interruptFlag;
 	}
 
-	public int getIORequestValue() {
-		return ioRequestValue;
+	public IORequest getCurrentIORequest() {
+		return currentIORequest;
+	}
+
+	public int getCurrentIORequestValue() {
+		return currentIORequestValue;
 	}
 
 	public void setInterruptFlag(InterruptTypes interruptFlag) {
@@ -68,8 +76,16 @@ public class CPU extends Thread {
 		this.pc = pc;
 	}
 
-	public void setIORequestValue(int value) {
-		this.ioRequestValue = value;
+	public void setCurrentIORequest(IORequest ioRequest) {
+		this.currentIORequest = ioRequest;
+	}
+
+	public void setCurrentIORequestValue(int value) {
+		this.currentIORequestValue = value;
+	}
+
+	public void setFinishedIO(boolean state) {
+		this.finishedIO = state;
 	}
 
 	public void showState() {
@@ -107,8 +123,6 @@ public class CPU extends Thread {
 				// execucao da CPU supoe que o contexto da CPU, vide acima, esta devidamente
 				// setado
 				while (true) {
-
-					// ciclo de instrucoes. acaba cfe instrucao, veja cada caso.
 
 					instructionsCounter++;
 
@@ -389,7 +403,13 @@ public class CPU extends Thread {
 
 					// Segue o loop se nao houve interrupcao.
 					if (interruptFlag == InterruptTypes.NO_INTERRUPT) {
-						continue;
+						// Checa se IO terminou.
+						if (finishedIO) {
+							this.interruptFlag = InterruptTypes.IO_FINISHED;
+							interruptHandler.handle();
+						} else {
+							continue;
+						}
 					}
 
 					// Houve interrupcao, deve ser tratada (fora do loop).
@@ -400,7 +420,6 @@ public class CPU extends Thread {
 				error.printStackTrace();
 			}
 		}
-
 	}
 }
 // ------------------ C P U - fim

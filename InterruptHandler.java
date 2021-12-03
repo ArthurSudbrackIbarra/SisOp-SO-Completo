@@ -47,8 +47,7 @@ public class InterruptHandler {
                 break;
 
             case IO_FINISHED:
-                // Fazer lógica aqui
-                int ioRequestValue = cpu.getIORequestValue();
+                ioFinishedRoutine();
                 break;
 
             case END_OF_PROGRAM:
@@ -103,5 +102,34 @@ public class InterruptHandler {
         Console.SEMA_CONSOLE.release();
         // Libera escalonador.
         Dispatcher.SEMA_DISPATCHER.release();
+    }
+
+    private void ioFinishedRoutine() {
+        // Informações do pedido de IO.
+        int ioRequestValue = cpu.getCurrentIORequestValue();
+        IORequest ioRequest = cpu.getCurrentIORequest();
+        PCB ioProcess = ioRequest.getProcess();
+
+        // Trocando processo.
+        ProcessManager.RUNNING = ioProcess;
+        // Salva PCB.
+        PCB interruptedProcess = cpu.unloadPCB();
+        // Coloca na fila de prontos.
+        ProcessManager.READY_LIST.add(interruptedProcess);
+        // Resetando interruptFlag da CPU.
+        cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
+        // Resetando pedido de IO terminado.
+        cpu.setFinishedIO(false);
+        // Carrega processo que pedio IO na CPU.
+        cpu.loadPCB(ioProcess);
+
+        // Escreve o valor (ioRequestValue) na memória ou printa ele na tela.
+        int physicalAddress = MemoryManager.translate(cpu.getReg()[8], cpu.getPageTable());
+        if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
+            cpu.m[physicalAddress].opc = Opcode.DATA;
+            cpu.m[physicalAddress].p = ioRequestValue;
+        } else {
+            System.out.println("\n[OUTPUT FROM PROCESS " + ioProcess.getId() + "] -" + ioRequestValue + "\n");
+        }
     }
 }
