@@ -45,6 +45,15 @@ public class ProcessManager {
 
     }
 
+    public static PCB findProcessById(int id) {
+        for (int i = 0; i < READY_LIST.size(); i++) {
+            if (READY_LIST.get(i).getId() == id) {
+                return READY_LIST.remove(i);
+            }
+        }
+        return null;
+    }
+
     public static void destroyProcess(int id) {
         for (int i = 0; i < READY_LIST.size(); i++) {
             PCB process = READY_LIST.get(i);

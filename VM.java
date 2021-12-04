@@ -35,11 +35,7 @@ public class VM {
         cpu.start();
         dispatcher.start();
         console.start();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-        }
-        processManager.createProcess(m, Programs.testOut);
+        processManager.createProcess(m, Programs.testIn);
         processManager.createProcess(m, Programs.pa);
     }
 }

@@ -111,30 +111,34 @@ public class InterruptHandler {
         }
     }
 
+    // ARRUMAR ESSE MÉTODO AINDA
     private void ioFinishedRoutine() {
-        // Informações do pedido de IO.
-        int ioRequestValue = cpu.getFirstIORequestValue();
-        IORequest ioRequest = cpu.getFirstIORequest();
-        PCB ioProcess = ioRequest.getProcess();
-
-        // Trocando processo.
-        ProcessManager.RUNNING = ioProcess;
+        int finishedIOProcessId = Console.getFirstFinishedIOProcessId();
+        PCB finishedIOProcess = ProcessManager.findProcessById(finishedIOProcessId);
         // Salva PCB.
         PCB interruptedProcess = cpu.unloadPCB();
         // Coloca na fila de prontos.
         ProcessManager.READY_LIST.add(interruptedProcess);
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
-        // Carrega processo que pedio IO na CPU.
-        cpu.loadPCB(ioProcess);
-
+        // Colocando processo na fila de prontos na primeira
+        // posição para ser executado logo em seguida.
+        ProcessManager.READY_LIST.add(0, finishedIOProcess);
+        // Trocando processo.
+        ProcessManager.RUNNING = finishedIOProcess;
         // Escreve o valor (ioRequestValue) na memória ou printa ele na tela.
         int physicalAddress = MemoryManager.translate(cpu.getReg()[8], cpu.getPageTable());
-        if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
+        if (finishedIOProcess.getReg()[7] == 1) {
             cpu.m[physicalAddress].opc = Opcode.DATA;
-            cpu.m[physicalAddress].p = ioRequestValue;
+            cpu.m[physicalAddress].p = finishedIOProcess.getIOValue();
         } else {
-            System.out.println("\n[OUTPUT FROM PROCESS " + ioProcess.getId() + "] " + ioRequestValue + "\n");
+            System.out.println(
+                    "\n[OUTPUT FROM PROCESS " + finishedIOProcess.getId() + "] " + finishedIOProcess.getIOValue()
+                            + "\n");
+        }
+        // Libera escalonador.
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+            Dispatcher.SEMA_DISPATCHER.release();
         }
     }
 }

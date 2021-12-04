@@ -22,20 +22,15 @@ public class CPU extends Thread {
 	private InterruptTypes interruptFlag;
 	private InterruptHandler interruptHandler;
 
-	private LinkedList<IORequest> finishedIORequests;
-	private LinkedList<Integer> finishedIORequestValues;
-
 	public CPU(Word[] m) {
 		this.pc = 0;
 		this.ir = null;
-		this.reg = new int[9]; // aloca o espaço dos registradores
+		this.reg = new int[9];
 		this.m = m;
 		this.currentProcessId = -1;
 		this.pageTable = null;
 		this.interruptFlag = InterruptTypes.NO_INTERRUPT;
 		this.interruptHandler = new InterruptHandler(this);
-		this.finishedIORequests = new LinkedList<>();
-		this.finishedIORequestValues = new LinkedList<>();
 	}
 
 	public int getPC() {
@@ -58,28 +53,12 @@ public class CPU extends Thread {
 		return interruptFlag;
 	}
 
-	public IORequest getFirstIORequest() {
-		return finishedIORequests.removeFirst();
-	}
-
-	public int getFirstIORequestValue() {
-		return finishedIORequestValues.removeFirst();
-	}
-
 	public void setInterruptFlag(InterruptTypes interruptFlag) {
 		this.interruptFlag = interruptFlag;
 	}
 
 	public void setContext(int pc) {
 		this.pc = pc;
-	}
-
-	public void addIORequestFinished(IORequest ioRequest) {
-		finishedIORequests.add(ioRequest);
-	}
-
-	public void addIORequestFinishedValue(int value) {
-		finishedIORequestValues.add(value);
 	}
 
 	public void showState() {
@@ -400,10 +379,9 @@ public class CPU extends Thread {
 					// Segue o loop se nao houve interrupcao.
 					if (interruptFlag == InterruptTypes.NO_INTERRUPT) {
 						// Checa se algum IO terminou.
-						if (finishedIORequests.size() > 0) {
+						if (Console.FINISHED_IO_PROCESS_IDS.size() > 0) {
 							this.interruptFlag = InterruptTypes.IO_FINISHED;
-							interruptHandler.handle();
-							instructionsCounter = 0;
+							break;
 						}
 						continue;
 					}

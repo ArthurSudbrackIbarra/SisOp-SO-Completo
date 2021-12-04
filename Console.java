@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
@@ -7,6 +8,8 @@ public class Console extends Thread {
 
     private CPU cpu;
     private Scanner reader;
+
+    public static LinkedList<Integer> FINISHED_IO_PROCESS_IDS = new LinkedList<>();
 
     public Console(CPU cpu) {
         this.cpu = cpu;
@@ -32,14 +35,11 @@ public class Console extends Thread {
     }
 
     private void read(IORequest ioRequest) {
-        System.out.println("[Processo " + ioRequest.getProcess().getId() + " - READ]");
-        System.out.print("Input: ");
+        PCB process = ioRequest.getProcess();
+        System.out.println("\n\n[Processo " + process.getId() + " - READ] Input:\n");
         int input = Integer.parseInt(reader.nextLine());
-        // Informa o valor IO à CPU.
-        cpu.addIORequestFinishedValue(input);
-        // Informa o processo que pediu IO à CPU. O incremento da lista de
-        // pedidios de IO finalizados irá interromper a CPU no próximo ciclo.
-        cpu.addIORequestFinished(ioRequest);
+        process.setIOValue(input);
+        addFinishedIOProcessId(process.getId());
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
@@ -52,15 +52,20 @@ public class Console extends Thread {
         System.out.println("[Processo " + process.getId() + " - WRITE]");
         int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getTablePage());
         int output = cpu.m[physicalAddress].p;
-        // Informa o valor IO à CPU.
-        cpu.addIORequestFinishedValue(output);
-        // Informa o processo que pediu IO à CPU. O incremento da lista de
-        // pedidios de IO finalizados irá interromper a CPU no próximo ciclo.
-        cpu.addIORequestFinished(ioRequest);
+        process.setIOValue(output);
+        addFinishedIOProcessId(process.getId());
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
             }
         }
+    }
+
+    public static void addFinishedIOProcessId(int id) {
+        FINISHED_IO_PROCESS_IDS.add(id);
+    }
+
+    public static int getFirstFinishedIOProcessId() {
+        return FINISHED_IO_PROCESS_IDS.removeFirst();
     }
 }
