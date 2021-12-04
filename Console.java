@@ -19,7 +19,7 @@ public class Console extends Thread {
             try {
                 SEMA_CONSOLE.acquire();
                 // Entrou algum processo bloqueado.
-                IORequest ioRequest = ProcessManager.BLOCKED_LIST.remove(0);
+                IORequest ioRequest = ProcessManager.BLOCKED_LIST.removeFirst();
                 if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
                     read(ioRequest);
                 } else {
@@ -36,13 +36,14 @@ public class Console extends Thread {
         System.out.print("Input: ");
         int input = Integer.parseInt(reader.nextLine());
         // Informa o valor IO à CPU.
-        cpu.setCurrentIORequestValue(input);
-        // Informa o processo que pediu IO à CPU.
-        cpu.setCurrentIORequest(ioRequest);
-        // Interrompe CPU.
-        cpu.setFinishedIO(true);
+        cpu.addIORequestFinishedValue(input);
+        // Informa o processo que pediu IO à CPU. O incremento da lista de
+        // pedidios de IO finalizados irá interromper a CPU no próximo ciclo.
+        cpu.addIORequestFinished(ioRequest);
         if (ProcessManager.READY_LIST.size() <= 0) {
-            cpu.SEMA_CPU.release();
+            if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+                Dispatcher.SEMA_DISPATCHER.release();
+            }
         }
     }
 
@@ -52,14 +53,14 @@ public class Console extends Thread {
         int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getTablePage());
         int output = cpu.m[physicalAddress].p;
         // Informa o valor IO à CPU.
-        cpu.setCurrentIORequestValue(output);
-        // Informa o processo que pediu IO à CPU.
-        cpu.setCurrentIORequest(ioRequest);
-        // Interrompe CPU.
-        cpu.setFinishedIO(true);
+        cpu.addIORequestFinishedValue(output);
+        // Informa o processo que pediu IO à CPU. O incremento da lista de
+        // pedidios de IO finalizados irá interromper a CPU no próximo ciclo.
+        cpu.addIORequestFinished(ioRequest);
         if (ProcessManager.READY_LIST.size() <= 0) {
-            cpu.SEMA_CPU.release();
+            if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+                Dispatcher.SEMA_DISPATCHER.release();
+            }
         }
     }
-
 }

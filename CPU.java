@@ -22,9 +22,8 @@ public class CPU extends Thread {
 	private InterruptTypes interruptFlag;
 	private InterruptHandler interruptHandler;
 
-	private IORequest currentIORequest;
-	private int currentIORequestValue;
-	private boolean finishedIO;
+	private LinkedList<IORequest> finishedIORequests;
+	private LinkedList<Integer> finishedIORequestValues;
 
 	public CPU(Word[] m) {
 		this.pc = 0;
@@ -35,9 +34,8 @@ public class CPU extends Thread {
 		this.pageTable = null;
 		this.interruptFlag = InterruptTypes.NO_INTERRUPT;
 		this.interruptHandler = new InterruptHandler(this);
-		this.currentIORequest = null;
-		this.currentIORequestValue = -1;
-		this.finishedIO = false;
+		this.finishedIORequests = new LinkedList<>();
+		this.finishedIORequestValues = new LinkedList<>();
 	}
 
 	public int getPC() {
@@ -60,12 +58,12 @@ public class CPU extends Thread {
 		return interruptFlag;
 	}
 
-	public IORequest getCurrentIORequest() {
-		return currentIORequest;
+	public IORequest getFirstIORequest() {
+		return finishedIORequests.removeFirst();
 	}
 
-	public int getCurrentIORequestValue() {
-		return currentIORequestValue;
+	public int getFirstIORequestValue() {
+		return finishedIORequestValues.removeFirst();
 	}
 
 	public void setInterruptFlag(InterruptTypes interruptFlag) {
@@ -76,16 +74,12 @@ public class CPU extends Thread {
 		this.pc = pc;
 	}
 
-	public void setCurrentIORequest(IORequest ioRequest) {
-		this.currentIORequest = ioRequest;
+	public void addIORequestFinished(IORequest ioRequest) {
+		finishedIORequests.add(ioRequest);
 	}
 
-	public void setCurrentIORequestValue(int value) {
-		this.currentIORequestValue = value;
-	}
-
-	public void setFinishedIO(boolean state) {
-		this.finishedIO = state;
+	public void addIORequestFinishedValue(int value) {
+		finishedIORequestValues.add(value);
 	}
 
 	public void showState() {
@@ -405,8 +399,8 @@ public class CPU extends Thread {
 
 					// Segue o loop se nao houve interrupcao.
 					if (interruptFlag == InterruptTypes.NO_INTERRUPT) {
-						// Checa se IO terminou.
-						if (finishedIO) {
+						// Checa se algum IO terminou.
+						if (finishedIORequests.size() > 0) {
 							this.interruptFlag = InterruptTypes.IO_FINISHED;
 							interruptHandler.handle();
 							instructionsCounter = 0;

@@ -70,7 +70,9 @@ public class InterruptHandler {
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera escalonador.
-        Dispatcher.SEMA_DISPATCHER.release();
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+            Dispatcher.SEMA_DISPATCHER.release();
+        }
     }
 
     private void saveProcess() {
@@ -82,7 +84,9 @@ public class InterruptHandler {
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera escalonador.
-        Dispatcher.SEMA_DISPATCHER.release();
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+            Dispatcher.SEMA_DISPATCHER.release();
+        }
     }
 
     private void packageForConsole() {
@@ -102,13 +106,15 @@ public class InterruptHandler {
         // Libera o console.
         Console.SEMA_CONSOLE.release();
         // Libera escalonador.
-        Dispatcher.SEMA_DISPATCHER.release();
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+            Dispatcher.SEMA_DISPATCHER.release();
+        }
     }
 
     private void ioFinishedRoutine() {
         // Informações do pedido de IO.
-        int ioRequestValue = cpu.getCurrentIORequestValue();
-        IORequest ioRequest = cpu.getCurrentIORequest();
+        int ioRequestValue = cpu.getFirstIORequestValue();
+        IORequest ioRequest = cpu.getFirstIORequest();
         PCB ioProcess = ioRequest.getProcess();
 
         // Trocando processo.
@@ -119,8 +125,6 @@ public class InterruptHandler {
         ProcessManager.READY_LIST.add(interruptedProcess);
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
-        // Resetando pedido de IO terminado.
-        cpu.setFinishedIO(false);
         // Carrega processo que pedio IO na CPU.
         cpu.loadPCB(ioProcess);
 
