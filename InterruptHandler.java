@@ -100,7 +100,9 @@ public class InterruptHandler {
             ioRequest = new IORequest(process, IORequest.OperationTypes.WRITE);
         }
         // Coloca na lista de bloqueados.
-        ProcessManager.BLOCKED_LIST.add(ioRequest);
+        ProcessManager.BLOCKED_LIST.add(process);
+        // Cria uma requisição de IO na lista.
+        Console.IO_REQUESTS.add(ioRequest);
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera o console.
@@ -111,10 +113,9 @@ public class InterruptHandler {
         }
     }
 
-    // ARRUMAR ESSE MÉTODO AINDA
     private void ioFinishedRoutine() {
         int finishedIOProcessId = Console.getFirstFinishedIOProcessId();
-        PCB finishedIOProcess = ProcessManager.findProcessById(finishedIOProcessId);
+        PCB finishedIOProcess = ProcessManager.findBlockedProcessById(finishedIOProcessId);
         // Salva PCB.
         PCB interruptedProcess = cpu.unloadPCB();
         // Coloca na fila de prontos.

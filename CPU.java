@@ -380,7 +380,7 @@ public class CPU extends Thread {
 					if (interruptFlag == InterruptTypes.NO_INTERRUPT) {
 						// Checa se algum IO terminou.
 						if (Console.FINISHED_IO_PROCESS_IDS.size() > 0) {
-							this.interruptFlag = InterruptTypes.IO_FINISHED;
+							interruptFlag = InterruptTypes.IO_FINISHED;
 							break;
 						}
 						continue;

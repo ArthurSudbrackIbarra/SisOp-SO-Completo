@@ -4,7 +4,7 @@ import java.util.LinkedList;
 public class ProcessManager {
 
     public static LinkedList<PCB> READY_LIST = new LinkedList<>();
-    public static LinkedList<IORequest> BLOCKED_LIST = new LinkedList<>();
+    public static LinkedList<PCB> BLOCKED_LIST = new LinkedList<>();
     public static PCB RUNNING = null;
 
     private int idCounter;
@@ -45,10 +45,10 @@ public class ProcessManager {
 
     }
 
-    public static PCB findProcessById(int id) {
-        for (int i = 0; i < READY_LIST.size(); i++) {
-            if (READY_LIST.get(i).getId() == id) {
-                return READY_LIST.remove(i);
+    public static PCB findBlockedProcessById(int id) {
+        for (int i = 0; i < BLOCKED_LIST.size(); i++) {
+            if (BLOCKED_LIST.get(i).getId() == id) {
+                return BLOCKED_LIST.remove(i);
             }
         }
         return null;
