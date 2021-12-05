@@ -25,9 +25,9 @@ public class Console extends Thread {
                 // Entrou algum processo bloqueado.
                 IORequest ioRequest = IO_REQUESTS.removeFirst();
                 if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
-                    read(ioRequest);
+                    read(ioRequest.getProcess());
                 } else {
-                    write(ioRequest);
+                    write(ioRequest.getProcess());
                 }
             } catch (InterruptedException error) {
                 error.printStackTrace();
@@ -35,8 +35,7 @@ public class Console extends Thread {
         }
     }
 
-    private void read(IORequest ioRequest) {
-        PCB process = ioRequest.getProcess();
+    private void read(PCB process) {
         System.out.println("\n\n[Processo " + process.getId() + " - READ] Input:\n");
         int input = Integer.parseInt(reader.nextLine());
         process.setIOValue(input);
@@ -49,8 +48,7 @@ public class Console extends Thread {
         }
     }
 
-    private void write(IORequest ioRequest) {
-        PCB process = ioRequest.getProcess();
+    private void write(PCB process) {
         System.out.println("[Processo " + process.getId() + " - WRITE]");
         int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getTablePage());
         int output = cpu.m[physicalAddress].p;

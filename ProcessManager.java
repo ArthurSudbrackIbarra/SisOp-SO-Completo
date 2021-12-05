@@ -54,13 +54,16 @@ public class ProcessManager {
         return null;
     }
 
-    public static void destroyProcess(int id) {
+    public static void destroyProcess(int processId, LinkedList<Integer> pageTable) {
+        MemoryManager.dealloc(pageTable);
         for (int i = 0; i < READY_LIST.size(); i++) {
-            PCB process = READY_LIST.get(i);
-            if (process.getId() == id) {
-                MemoryManager.dealloc(process.getTablePage());
+            if (READY_LIST.get(i).getId() == processId) {
                 READY_LIST.remove(i);
-                break;
+            }
+        }
+        for (int i = 0; i < BLOCKED_LIST.size(); i++) {
+            if (BLOCKED_LIST.get(i).getId() == processId) {
+                BLOCKED_LIST.remove(i);
             }
         }
     }

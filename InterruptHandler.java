@@ -64,7 +64,7 @@ public class InterruptHandler {
     private void endProcess() {
         if (ProcessManager.RUNNING != null) {
             // Finaliza processo (perde a referencia).
-            ProcessManager.destroyProcess(ProcessManager.RUNNING.getId());
+            ProcessManager.destroyProcess(cpu.getCurrentProcessId(), cpu.getPageTable());
             ProcessManager.RUNNING = null;
         }
         // Resetando interruptFlag da CPU.
@@ -125,8 +125,6 @@ public class InterruptHandler {
         // Colocando processo na fila de prontos na primeira
         // posição para ser executado logo em seguida.
         ProcessManager.READY_LIST.add(0, finishedIOProcess);
-        // Trocando processo.
-        ProcessManager.RUNNING = finishedIOProcess;
         // Escreve o valor (ioRequestValue) na memória ou printa ele na tela.
         int physicalAddress = MemoryManager.translate(cpu.getReg()[8], cpu.getPageTable());
         if (finishedIOProcess.getReg()[7] == 1) {

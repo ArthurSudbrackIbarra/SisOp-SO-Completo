@@ -45,6 +45,10 @@ public class CPU extends Thread {
 		return reg;
 	}
 
+	public int getCurrentProcessId() {
+		return currentProcessId;
+	}
+
 	public LinkedList<Integer> getPageTable() {
 		return pageTable;
 	}
