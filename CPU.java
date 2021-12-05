@@ -23,6 +23,7 @@ public class CPU extends Thread {
 	private InterruptHandler interruptHandler;
 
 	public CPU(Word[] m) {
+		super("CPU");
 		this.pc = 0;
 		this.ir = null;
 		this.reg = new int[9];
@@ -81,7 +82,7 @@ public class CPU extends Thread {
 		this.currentProcessId = pcb.getId();
 		this.pc = pcb.getPc();
 		this.reg = pcb.getReg().clone();
-		this.pageTable = new LinkedList<Integer>(pcb.getTablePage());
+		this.pageTable = new LinkedList<Integer>(pcb.getPageTable());
 	}
 
 	public PCB unloadPCB() {

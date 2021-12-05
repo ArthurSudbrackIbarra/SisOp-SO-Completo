@@ -13,6 +13,7 @@ public class Console extends Thread {
     public static LinkedList<Integer> FINISHED_IO_PROCESS_IDS = new LinkedList<>();
 
     public Console(CPU cpu) {
+        super("Console");
         this.cpu = cpu;
         this.reader = new Scanner(System.in);
     }
@@ -41,6 +42,7 @@ public class Console extends Thread {
         process.setIOValue(input);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());
+        
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
@@ -50,11 +52,14 @@ public class Console extends Thread {
 
     private void write(PCB process) {
         System.out.println("[Processo " + process.getId() + " - WRITE]");
-        int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getTablePage());
+        int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getPageTable());
         int output = cpu.m[physicalAddress].p;
         process.setIOValue(output);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());
+        // Colocando processo na fila de prontos na primeira
+        // posição para ser executado logo em seguida.
+        ProcessManager.READY_LIST.add(0, process);
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();

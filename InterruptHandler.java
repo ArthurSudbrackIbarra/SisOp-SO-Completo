@@ -118,15 +118,15 @@ public class InterruptHandler {
         PCB finishedIOProcess = ProcessManager.findBlockedProcessById(finishedIOProcessId);
         // Salva PCB.
         PCB interruptedProcess = cpu.unloadPCB();
-        // Coloca na fila de prontos.
+        // Coloca o processo interrompido na fila de prontos.
         ProcessManager.READY_LIST.add(interruptedProcess);
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
-        // Colocando processo na fila de prontos na primeira
+        // Colocando processo que terminou IO na fila de prontos na primeira
         // posição para ser executado logo em seguida.
         ProcessManager.READY_LIST.add(0, finishedIOProcess);
         // Escreve o valor (ioRequestValue) na memória ou printa ele na tela.
-        int physicalAddress = MemoryManager.translate(cpu.getReg()[8], cpu.getPageTable());
+        int physicalAddress = MemoryManager.translate(finishedIOProcess.getReg()[8], finishedIOProcess.getPageTable());
         if (finishedIOProcess.getReg()[7] == 1) {
             cpu.m[physicalAddress].opc = Opcode.DATA;
             cpu.m[physicalAddress].p = finishedIOProcess.getIOValue();
