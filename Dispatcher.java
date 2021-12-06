@@ -7,6 +7,7 @@ public class Dispatcher extends Thread {
     private CPU cpu;
 
     public Dispatcher(CPU cpu) {
+        super("Dispatcher");
         this.cpu = cpu;
     }
 

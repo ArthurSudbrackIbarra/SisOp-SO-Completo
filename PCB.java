@@ -7,13 +7,16 @@ public class PCB {
     private int pc;
     private int[] reg;
 
-    private LinkedList<Integer> tablePage;
+    private LinkedList<Integer> pageTable;
 
-    public PCB(int id, int pc, int[] reg, LinkedList<Integer> tablePage) {
+    private int ioValue;
+
+    public PCB(int id, int pc, int[] reg, LinkedList<Integer> pageTable) {
         this.id = id;
         this.pc = pc;
         this.reg = reg;
-        this.tablePage = tablePage;
+        this.pageTable = pageTable;
+        this.ioValue = -1;
     }
 
     public int getId() {
@@ -28,8 +31,16 @@ public class PCB {
         return reg;
     }
 
-    public LinkedList<Integer> getTablePage() {
-        return tablePage;
+    public LinkedList<Integer> getPageTable() {
+        return pageTable;
+    }
+
+    public int getIOValue() {
+        return ioValue;
+    }
+
+    public void setIOValue(int ioValue) {
+        this.ioValue = ioValue;
     }
 
 }

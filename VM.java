@@ -3,11 +3,11 @@
 public class VM {
 
     public Word[] m;
-    public CPU cpu;
 
-    public ProcessManager processManager;
-    public Dispatcher dispatcher;
-    public Console console;
+    private Shell shell;
+    public CPU cpu;
+    private Dispatcher dispatcher;
+    private Console console;
 
     public VM() {
 
@@ -17,11 +17,11 @@ public class VM {
             m[i] = new Word(Opcode.___, -1, -1, -1);
         }
 
+        // Shell
+        this.shell = new Shell(new ProcessManager(m));
+
         // CPU
         cpu = new CPU(m);
-
-        // Gerenciador de processos
-        this.processManager = new ProcessManager();
 
         // Escalonador
         this.dispatcher = new Dispatcher(cpu);
@@ -31,17 +31,14 @@ public class VM {
 
     }
 
-    public void startTest() {
+    public void startThreads() {
+        // Iniciando as threads.
+        shell.start();
         cpu.start();
         dispatcher.start();
         console.start();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-        }
-        processManager.createProcess(m, Programs.testOut);
-        processManager.createProcess(m, Programs.pa);
     }
+
 }
 // ------------------- V M - fim
 // ------------------------------------------------------------------------

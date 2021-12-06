@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
@@ -8,7 +9,11 @@ public class Console extends Thread {
     private CPU cpu;
     private Scanner reader;
 
+    public static LinkedList<IORequest> IO_REQUESTS = new LinkedList<>();
+    public static LinkedList<Integer> FINISHED_IO_PROCESS_IDS = new LinkedList<>();
+
     public Console(CPU cpu) {
+        super("Console");
         this.cpu = cpu;
         this.reader = new Scanner(System.in);
     }
@@ -19,11 +24,11 @@ public class Console extends Thread {
             try {
                 SEMA_CONSOLE.acquire();
                 // Entrou algum processo bloqueado.
-                IORequest ioRequest = ProcessManager.BLOCKED_LIST.removeFirst();
+                IORequest ioRequest = IO_REQUESTS.removeFirst();
                 if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
-                    read(ioRequest);
+                    read(ioRequest.getProcess());
                 } else {
-                    write(ioRequest);
+                    write(ioRequest.getProcess());
                 }
             } catch (InterruptedException error) {
                 error.printStackTrace();
@@ -31,15 +36,12 @@ public class Console extends Thread {
         }
     }
 
-    private void read(IORequest ioRequest) {
-        System.out.println("[Processo " + ioRequest.getProcess().getId() + " - READ]");
-        System.out.print("Input: ");
+    private void read(PCB process) {
+        System.out.println("\n\n[Processo " + process.getId() + " - READ] Input:\n");
         int input = Integer.parseInt(reader.nextLine());
-        // Informa o valor IO à CPU.
-        cpu.addIORequestFinishedValue(input);
-        // Informa o processo que pediu IO à CPU. O incremento da lista de
-        // pedidios de IO finalizados irá interromper a CPU no próximo ciclo.
-        cpu.addIORequestFinished(ioRequest);
+        process.setIOValue(input);
+        addFinishedIOProcessId(process.getId());
+        removeIORequest(process.getId());
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
@@ -47,20 +49,33 @@ public class Console extends Thread {
         }
     }
 
-    private void write(IORequest ioRequest) {
-        PCB process = ioRequest.getProcess();
+    private void write(PCB process) {
         System.out.println("[Processo " + process.getId() + " - WRITE]");
-        int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getTablePage());
+        int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getPageTable());
         int output = cpu.m[physicalAddress].p;
-        // Informa o valor IO à CPU.
-        cpu.addIORequestFinishedValue(output);
-        // Informa o processo que pediu IO à CPU. O incremento da lista de
-        // pedidios de IO finalizados irá interromper a CPU no próximo ciclo.
-        cpu.addIORequestFinished(ioRequest);
+        process.setIOValue(output);
+        addFinishedIOProcessId(process.getId());
+        removeIORequest(process.getId());
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
             }
         }
+    }
+
+    private static void removeIORequest(int processId) {
+        for (int i = 0; i < IO_REQUESTS.size(); i++) {
+            if (IO_REQUESTS.get(i).getProcess().getId() == processId) {
+                IO_REQUESTS.remove(i);
+            }
+        }
+    }
+
+    public static void addFinishedIOProcessId(int id) {
+        FINISHED_IO_PROCESS_IDS.add(id);
+    }
+
+    public static int getFirstFinishedIOProcessId() {
+        return FINISHED_IO_PROCESS_IDS.removeFirst();
     }
 }

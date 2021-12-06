@@ -64,7 +64,7 @@ public class InterruptHandler {
     private void endProcess() {
         if (ProcessManager.RUNNING != null) {
             // Finaliza processo (perde a referencia).
-            ProcessManager.destroyProcess(ProcessManager.RUNNING.getId());
+            ProcessManager.destroyProcess(cpu.getCurrentProcessId(), cpu.getPageTable());
             ProcessManager.RUNNING = null;
         }
         // Resetando interruptFlag da CPU.
@@ -100,7 +100,9 @@ public class InterruptHandler {
             ioRequest = new IORequest(process, IORequest.OperationTypes.WRITE);
         }
         // Coloca na lista de bloqueados.
-        ProcessManager.BLOCKED_LIST.add(ioRequest);
+        ProcessManager.BLOCKED_LIST.add(process);
+        // Cria uma requisição de IO na lista.
+        Console.IO_REQUESTS.add(ioRequest);
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera o console.
@@ -112,29 +114,30 @@ public class InterruptHandler {
     }
 
     private void ioFinishedRoutine() {
-        // Informações do pedido de IO.
-        int ioRequestValue = cpu.getFirstIORequestValue();
-        IORequest ioRequest = cpu.getFirstIORequest();
-        PCB ioProcess = ioRequest.getProcess();
-
-        // Trocando processo.
-        ProcessManager.RUNNING = ioProcess;
+        int finishedIOProcessId = Console.getFirstFinishedIOProcessId();
+        PCB finishedIOProcess = ProcessManager.findBlockedProcessById(finishedIOProcessId);
         // Salva PCB.
         PCB interruptedProcess = cpu.unloadPCB();
-        // Coloca na fila de prontos.
+        // Coloca o processo interrompido na fila de prontos.
         ProcessManager.READY_LIST.add(interruptedProcess);
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
-        // Carrega processo que pedio IO na CPU.
-        cpu.loadPCB(ioProcess);
-
+        // Colocando processo que terminou IO na fila de prontos na primeira
+        // posição para ser executado logo em seguida.
+        ProcessManager.READY_LIST.add(0, finishedIOProcess);
         // Escreve o valor (ioRequestValue) na memória ou printa ele na tela.
-        int physicalAddress = MemoryManager.translate(cpu.getReg()[8], cpu.getPageTable());
-        if (ioRequest.getOperationType() == IORequest.OperationTypes.READ) {
+        int physicalAddress = MemoryManager.translate(finishedIOProcess.getReg()[8], finishedIOProcess.getPageTable());
+        if (finishedIOProcess.getReg()[7] == 1) {
             cpu.m[physicalAddress].opc = Opcode.DATA;
-            cpu.m[physicalAddress].p = ioRequestValue;
+            cpu.m[physicalAddress].p = finishedIOProcess.getIOValue();
         } else {
-            System.out.println("\n[OUTPUT FROM PROCESS " + ioProcess.getId() + "] " + ioRequestValue + "\n");
+            System.out.println(
+                    "\n[OUTPUT FROM PROCESS " + finishedIOProcess.getId() + "] " + finishedIOProcess.getIOValue()
+                            + "\n");
+        }
+        // Libera escalonador.
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+            Dispatcher.SEMA_DISPATCHER.release();
         }
     }
 }
