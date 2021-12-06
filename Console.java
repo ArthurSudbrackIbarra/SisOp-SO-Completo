@@ -54,7 +54,9 @@ public class Console extends Thread {
     }
 
     private void write(PCB process) {
-        System.out.println("[Processo " + process.getId() + " - WRITE]");
+        System.out.println(
+                "\n\n[Processo com ID = " + process.getId() + " - "
+                        + ProcessManager.getProgramNameByProcessId(process.getId()) + " - WRITE]\n");
         int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getPageTable());
         int output = cpu.m[physicalAddress].p;
         process.setIOValue(output);

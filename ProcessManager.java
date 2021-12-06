@@ -22,9 +22,11 @@ public class ProcessManager {
 
         LinkedList<Integer> tablePage = MemoryManager.alloc(program);
 
-        if (tablePage == null)
+        if (tablePage == null) {
             System.out.println("Não foi possível criar um processo para o programa " + program.getName()
                     + " pois não há espaço o suficiente na memória.");
+            return;
+        }
 
         int id = idCounter;
         int pc = 0;

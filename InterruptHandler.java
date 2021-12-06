@@ -132,7 +132,9 @@ public class InterruptHandler {
             cpu.m[physicalAddress].p = finishedIOProcess.getIOValue();
         } else {
             System.out.println(
-                    "\n[OUTPUT FROM PROCESS " + finishedIOProcess.getId() + "] " + finishedIOProcess.getIOValue()
+                    "\n[Output from process with ID = " + finishedIOProcess.getId() + " - "
+                            + ProcessManager.getProgramNameByProcessId(finishedIOProcess.getId()) + "] "
+                            + finishedIOProcess.getIOValue()
                             + "\n");
         }
         // Libera escalonador.

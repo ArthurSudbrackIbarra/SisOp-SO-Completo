@@ -13,7 +13,7 @@ public class Shell extends Thread {
 
     @Override
     public void run() {
-        String menu = "===== MENU =====\n\n" +
+        String menu = "===== MENU =====\n" +
                 "\n= Criar um processo =\n" +
                 "\n[1] - ProgMinimo" +
                 "\n[2] - Fibonacci10" +
@@ -23,6 +23,7 @@ public class Shell extends Thread {
                 "\n[6] - PC (Bubblesort)" +
                 "\n[7] - Test In" +
                 "\n[8] - Test Out" +
+                "\n[x;y;z;...] - Criar mais de 1 processo por vez (Exemplo: 6;4;5)" +
                 "\n\n= Opções extras =\n" +
                 "\n[dump] - Dump da memória" +
                 "\n\nDigite uma das opções mostradas:";
@@ -31,35 +32,39 @@ public class Shell extends Thread {
             System.out.println("\n[AVISO: Shell está esperando input do usuário]\n");
             String option = scanner.nextLine();
             System.out.println("\nShell recebeu o input do usuário [OK]\n");
-            switch (option.toLowerCase()) {
-                case "1":
-                    processManager.createProcess(Programs.progMinimo);
-                    break;
-                case "2":
-                    processManager.createProcess(Programs.fibonacci10);
-                    break;
-                case "3":
-                    processManager.createProcess(Programs.fatorial);
-                    break;
-                case "4":
-                    processManager.createProcess(Programs.pa);
-                    break;
-                case "5":
-                    processManager.createProcess(Programs.pb);
-                    break;
-                case "6":
-                    processManager.createProcess(Programs.pc);
-                    break;
-                case "7":
-                    processManager.createProcess(Programs.testIn);
-                    break;
-                case "8":
-                    processManager.createProcess(Programs.testOut);
-                    break;
-                case "dump":
-                    System.out.println(Auxiliary.dump(processManager.getMemory(), 0, MySystem.MEMORY_SIZE));
-                default:
-                    System.out.println("\nErro: Opção inválida de input para o Schell\n");
+            String[] processes = option.toLowerCase().split(";");
+            for (String process : processes) {
+                switch (process) {
+                    case "1":
+                        processManager.createProcess(Programs.progMinimo);
+                        break;
+                    case "2":
+                        processManager.createProcess(Programs.fibonacci10);
+                        break;
+                    case "3":
+                        processManager.createProcess(Programs.fatorial);
+                        break;
+                    case "4":
+                        processManager.createProcess(Programs.pa);
+                        break;
+                    case "5":
+                        processManager.createProcess(Programs.pb);
+                        break;
+                    case "6":
+                        processManager.createProcess(Programs.pc);
+                        break;
+                    case "7":
+                        processManager.createProcess(Programs.testIn);
+                        break;
+                    case "8":
+                        processManager.createProcess(Programs.testOut);
+                        break;
+                    case "dump":
+                        System.out.println(Auxiliary.dump(processManager.getMemory(), 0, MySystem.MEMORY_SIZE));
+                        break;
+                    default:
+                        System.out.println("\n[ERRO: Opção inválida de input para o Schell]\n");
+                }
             }
         }
     }
