@@ -41,7 +41,8 @@ public class ProcessManager {
 
         idCounter++;
 
-        System.out.println("Criado processo do programa: " + program.getName());
+        System.out.println(
+                "Criado processo do programa: " + program.getName() + "\nTabela de páginas: " + tablePage + "\n");
 
         // Libera dispatcher se nao tem processo rodando.
         if (READY_LIST.size() == 1 && RUNNING == null) {
