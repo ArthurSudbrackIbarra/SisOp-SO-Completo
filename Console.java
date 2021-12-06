@@ -41,7 +41,7 @@ public class Console extends Thread {
         int input = Integer.parseInt(reader.nextLine());
         process.setIOValue(input);
         addFinishedIOProcessId(process.getId());
-        removeIORequest(process.getId());   
+        removeIORequest(process.getId());
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
@@ -56,9 +56,6 @@ public class Console extends Thread {
         process.setIOValue(output);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());
-        // Colocando processo na fila de prontos na primeira
-        // posição para ser executado logo em seguida.
-        ProcessManager.READY_LIST.add(0, process);
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();
