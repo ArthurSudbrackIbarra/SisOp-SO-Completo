@@ -3,25 +3,26 @@ import java.util.LinkedList;
 // -------------------------------------------  classes e funcoes auxiliares
 public class Auxiliary {
 
-    public static void dump(Word w) {
-        System.out.print("[ ");
-        System.out.print(w.opc);
-        System.out.print(", ");
-        System.out.print(w.r1);
-        System.out.print(", ");
-        System.out.print(w.r2);
-        System.out.print(", ");
-        System.out.print(w.p);
-        System.out.println("  ] ");
+    public static String dump(Word w) {
+        String dump = "";
+        dump += "[";
+        dump += w.opc;
+        dump += ", ";
+        dump += w.r1;
+        dump += ", ";
+        dump += w.r2;
+        dump += ", ";
+        dump += w.p;
+        dump += "]";
+        return dump;
     }
 
-    public static void dump(Word[] m, int ini, int fim) {
+    public static String dump(Word[] m, int ini, int fim) {
+        String dump = "";
         for (int i = ini; i < fim; i++) {
-            System.out.print(i);
-            System.out.print(":  ");
-            dump(m[i]);
+            dump += i + ":" + dump(m[i]) + "\n";
         }
-
+        return dump;
     }
 
     public static void load(Program program, Word[] m, LinkedList<Integer> pageTable) {

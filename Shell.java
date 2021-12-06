@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Shell extends Thread {
 
     private Scanner scanner;
-    ProcessManager processManager;
+    private ProcessManager processManager;
 
     public Shell(ProcessManager processManager) {
         super("Shell");
@@ -13,7 +13,8 @@ public class Shell extends Thread {
 
     @Override
     public void run() {
-        String menu = "== MENU ==\n" +
+        String menu = "===== MENU =====\n\n" +
+                "\n= Criar um processo =\n" +
                 "\n[1] - ProgMinimo" +
                 "\n[2] - Fibonacci10" +
                 "\n[3] - Fatorial" +
@@ -21,12 +22,16 @@ public class Shell extends Thread {
                 "\n[5] - PB (Fatorial)" +
                 "\n[6] - PC (Bubblesort)" +
                 "\n[7] - Test In" +
-                "\n[Outro] - Test Out" +
-                "\n\nDigite um dos números mostrados para criar uma instância do processo desejado:";
+                "\n[8] - Test Out" +
+                "\n\n= Opções extras =\n" +
+                "\n[dump] - Dump da memória" +
+                "\n\nDigite uma das opções mostradas:";
         System.out.println(menu);
         while (true) {
+            System.out.println("\n[AVISO: Shell está esperando input do usuário]\n");
             String option = scanner.nextLine();
-            switch (option) {
+            System.out.println("\nShell recebeu o input do usuário [OK]\n");
+            switch (option.toLowerCase()) {
                 case "1":
                     processManager.createProcess(Programs.progMinimo);
                     break;
@@ -48,8 +53,13 @@ public class Shell extends Thread {
                 case "7":
                     processManager.createProcess(Programs.testIn);
                     break;
-                default:
+                case "8":
                     processManager.createProcess(Programs.testOut);
+                    break;
+                case "dump":
+                    System.out.println(Auxiliary.dump(processManager.getMemory(), 0, MySystem.MEMORY_SIZE));
+                default:
+                    System.out.println("\nErro: Opção inválida de input para o Schell\n");
             }
         }
     }

@@ -11,11 +11,10 @@ public class ProcessManager {
 
     private int idCounter;
 
-    private HashMap<Integer, String> programNamesMap;
+    private static HashMap<Integer, String> programNamesMap = new HashMap<>();
 
     public ProcessManager(Word[] memory) {
         this.idCounter = 1;
-        this.programNamesMap = new HashMap<>();
         this.memory = memory;
     }
 
@@ -24,7 +23,8 @@ public class ProcessManager {
         LinkedList<Integer> tablePage = MemoryManager.alloc(program);
 
         if (tablePage == null)
-            System.out.println("Não foi possível criar o processo pois não há espaço o suficiente na memória.");
+            System.out.println("Não foi possível criar um processo para o programa " + program.getName()
+                    + " pois não há espaço o suficiente na memória.");
 
         int id = idCounter;
         int pc = 0;
@@ -39,11 +39,17 @@ public class ProcessManager {
 
         idCounter++;
 
+        System.out.println("Criado processo do programa: " + program.getName());
+
         // Libera dispatcher se nao tem processo rodando.
         if (READY_LIST.size() == 1 && RUNNING == null) {
             Dispatcher.SEMA_DISPATCHER.release();
         }
 
+    }
+
+    public Word[] getMemory() {
+        return memory;
     }
 
     public static PCB findBlockedProcessById(int id) {
@@ -67,6 +73,10 @@ public class ProcessManager {
                 BLOCKED_LIST.remove(i);
             }
         }
+    }
+
+    public static String getProgramNameByProcessId(int processId) {
+        return programNamesMap.get(processId);
     }
 
 }

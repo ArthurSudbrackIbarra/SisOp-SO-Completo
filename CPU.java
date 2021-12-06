@@ -75,7 +75,7 @@ public class CPU extends Thread {
 		}
 		System.out.println("");
 		System.out.print("           ");
-		Auxiliary.dump(ir);
+		System.out.println(Auxiliary.dump(ir));
 	}
 
 	public void loadPCB(PCB pcb) {

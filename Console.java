@@ -37,8 +37,12 @@ public class Console extends Thread {
     }
 
     private void read(PCB process) {
-        System.out.println("\n\n[Processo " + process.getId() + " - READ] Input:\n");
+        System.out.println(
+                "\n\n[Processo com ID = " + process.getId() + " - "
+                        + ProcessManager.getProgramNameByProcessId(process.getId())
+                        + " - READ] [AVISO: Console está esperando input do usuário]:\n");
         int input = Integer.parseInt(reader.nextLine());
+        System.out.println("\nConsole recebeu o input do usuário [OK]\n");
         process.setIOValue(input);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());

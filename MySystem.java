@@ -20,7 +20,7 @@ public class MySystem {
 	public static final int MEMORY_SIZE = 110;
 	public static final int PAGE_SIZE = 10;
 
-	public static final int MAX_CPU_CYCLES = 5;
+	public static final int MAX_CPU_CYCLES = 10;
 
 	public MySystem() {
 		vm = new VM(); // a VM com tratamento de interrupções

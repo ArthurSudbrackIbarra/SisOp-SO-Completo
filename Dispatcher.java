@@ -19,7 +19,8 @@ public class Dispatcher extends Thread {
                 SEMA_DISPATCHER.acquire();
                 if (ProcessManager.READY_LIST.size() > 0) {
                     PCB nextProccess = ProcessManager.READY_LIST.removeFirst();
-                    System.out.println("\nEscalonando processo com ID = " + nextProccess.getId());
+                    System.out.println("\nEscalonando processo com ID = " + nextProccess.getId() + " ["
+                            + ProcessManager.getProgramNameByProcessId(nextProccess.getId()) + "]");
                     ProcessManager.RUNNING = nextProccess;
                     cpu.loadPCB(nextProccess);
                     // CPU liberada.
