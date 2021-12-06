@@ -31,9 +31,7 @@ public class MySystem {
 	public static void main(String args[]) {
 
 		MySystem system = new MySystem();
-
-		// Comeca o teste
-		system.vm.startTest();
+		system.vm.startThreads();
 
 	}
 

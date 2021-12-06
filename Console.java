@@ -41,8 +41,7 @@ public class Console extends Thread {
         int input = Integer.parseInt(reader.nextLine());
         process.setIOValue(input);
         addFinishedIOProcessId(process.getId());
-        removeIORequest(process.getId());
-        
+        removeIORequest(process.getId());   
         if (ProcessManager.READY_LIST.size() <= 0) {
             if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
                 Dispatcher.SEMA_DISPATCHER.release();

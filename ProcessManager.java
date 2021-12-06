@@ -7,21 +7,24 @@ public class ProcessManager {
     public static LinkedList<PCB> BLOCKED_LIST = new LinkedList<>();
     public static PCB RUNNING = null;
 
+    private Word[] memory;
+
     private int idCounter;
 
     private HashMap<Integer, String> programNamesMap;
 
-    public ProcessManager() {
+    public ProcessManager(Word[] memory) {
         this.idCounter = 1;
         this.programNamesMap = new HashMap<>();
+        this.memory = memory;
     }
 
-    public boolean createProcess(Word[] m, Program program) {
+    public void createProcess(Program program) {
 
         LinkedList<Integer> tablePage = MemoryManager.alloc(program);
 
         if (tablePage == null)
-            return false;
+            System.out.println("Não foi possível criar o processo pois não há espaço o suficiente na memória.");
 
         int id = idCounter;
         int pc = 0;
@@ -30,18 +33,16 @@ public class ProcessManager {
         PCB pcb = new PCB(id, pc, reg, tablePage);
         READY_LIST.add(pcb);
 
-        Auxiliary.load(program, m, tablePage);
+        Auxiliary.load(program, this.memory, tablePage);
 
         programNamesMap.put(id, program.getName());
 
         idCounter++;
 
         // Libera dispatcher se nao tem processo rodando.
-        if (READY_LIST.size() == 1) {
+        if (READY_LIST.size() == 1 && RUNNING == null) {
             Dispatcher.SEMA_DISPATCHER.release();
         }
-
-        return true;
 
     }
 
