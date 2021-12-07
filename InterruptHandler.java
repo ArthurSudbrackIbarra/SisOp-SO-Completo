@@ -84,7 +84,7 @@ public class InterruptHandler {
         // Resetando interruptFlag da CPU.
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Libera escalonador.
-        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0 && ProcessManager.RUNNING == null) {
             Dispatcher.SEMA_DISPATCHER.release();
         }
     }
@@ -108,12 +108,13 @@ public class InterruptHandler {
         // Libera o console.
         Console.SEMA_CONSOLE.release();
         // Libera escalonador.
-        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0 && ProcessManager.RUNNING == null) {
             Dispatcher.SEMA_DISPATCHER.release();
         }
     }
 
     private void ioFinishedRoutine() {
+        ProcessManager.RUNNING = null;
         int finishedIOProcessId = Console.getFirstFinishedIOProcessId();
         PCB finishedIOProcess = ProcessManager.findBlockedProcessById(finishedIOProcessId);
         // Salva PCB.
@@ -124,7 +125,7 @@ public class InterruptHandler {
         cpu.setInterruptFlag(InterruptTypes.NO_INTERRUPT);
         // Colocando processo que terminou IO na fila de prontos na primeira
         // posição para ser executado logo em seguida.
-        ProcessManager.READY_LIST.add(0, finishedIOProcess);
+        ProcessManager.READY_LIST.addFirst(finishedIOProcess);
         // Escreve o valor (ioRequestValue) na memória ou printa ele na tela.
         int physicalAddress = MemoryManager.translate(finishedIOProcess.getReg()[8], finishedIOProcess.getPageTable());
         if (finishedIOProcess.getReg()[7] == 1) {
@@ -138,7 +139,28 @@ public class InterruptHandler {
                             + "\n");
         }
         // Libera escalonador.
-        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0) {
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0 && ProcessManager.RUNNING == null) {
+            Dispatcher.SEMA_DISPATCHER.release();
+        }
+    }
+
+    public void noOtherProcessRunningRoutine() {
+        int finishedIOProcessId = Console.getFirstFinishedIOProcessId();
+        PCB finishedIOProcess = ProcessManager.findBlockedProcessById(finishedIOProcessId);
+        int physicalAddress = MemoryManager.translate(finishedIOProcess.getReg()[8], finishedIOProcess.getPageTable());
+        if (finishedIOProcess.getReg()[7] == 1) {
+            cpu.m[physicalAddress].opc = Opcode.DATA;
+            cpu.m[physicalAddress].p = finishedIOProcess.getIOValue();
+        } else {
+            System.out.println(
+                    "\n[Output from process with ID = " + finishedIOProcess.getId() + " - "
+                            + ProcessManager.getProgramNameByProcessId(finishedIOProcess.getId()) + "] "
+                            + finishedIOProcess.getIOValue()
+                            + "\n");
+        }
+        ProcessManager.READY_LIST.addFirst(finishedIOProcess);
+        // Libera escalonador.
+        if (Dispatcher.SEMA_DISPATCHER.availablePermits() == 0 && ProcessManager.RUNNING == null) {
             Dispatcher.SEMA_DISPATCHER.release();
         }
     }

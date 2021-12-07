@@ -58,6 +58,10 @@ public class CPU extends Thread {
 		return interruptFlag;
 	}
 
+	public InterruptHandler getInterruptHandler() {
+		return interruptHandler;
+	}
+
 	public void setInterruptFlag(InterruptTypes interruptFlag) {
 		this.interruptFlag = interruptFlag;
 	}

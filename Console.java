@@ -41,10 +41,6 @@ public class Console extends Thread {
                 "\n\n[Processo com ID = " + process.getId() + " - "
                         + ProcessManager.getProgramNameByProcessId(process.getId())
                         + " - READ] [AVISO: Console está esperando input do usuário]:\n");
-        System.out.println(
-                "\n\nSe não houver nenhum processo na lista de prontos a ser executado, crie outro processo, " +
-                        "o qual será interrompido por uma interrupção de finalização de IO, para dar sequência ao processo que pediu IO.\n");
-
         String inputAsString = reader.nextLine();
         System.out.println("\nConsole recebeu o input do usuário [OK]\n");
         int input;
@@ -58,22 +54,23 @@ public class Console extends Thread {
         process.setIOValue(input);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());
+        if (ProcessManager.READY_LIST.size() <= 0) {
+            cpu.getInterruptHandler().noOtherProcessRunningRoutine();
+        }
     }
 
     private void write(PCB process) {
         System.out.println(
                 "\n\n[Processo com ID = " + process.getId() + " - "
                         + ProcessManager.getProgramNameByProcessId(process.getId()) + " - WRITE]\n");
-        System.out.println(
-                "\n\nSe não houver nenhum processo na lista de prontos a ser executado, crie outro processo, " +
-                        "o qual será interrompido por uma interrupção de finalização de IO, para dar sequência ao processo que pediu IO.\n");
         int physicalAddress = MemoryManager.translate(process.getReg()[8], process.getPageTable());
         int output = cpu.m[physicalAddress].p;
         process.setIOValue(output);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());
-        System.out.println(
-                "\nCrie outro processo, o qual será interrompido por uma interrupção de finalização de IO, para dar sequência ao processo que pediu IO.");
+        if (ProcessManager.READY_LIST.size() <= 0) {
+            cpu.getInterruptHandler().noOtherProcessRunningRoutine();
+        }
     }
 
     private static void removeIORequest(int processId) {
@@ -91,4 +88,5 @@ public class Console extends Thread {
     public static int getFirstFinishedIOProcessId() {
         return FINISHED_IO_PROCESS_IDS.removeFirst();
     }
+
 }
