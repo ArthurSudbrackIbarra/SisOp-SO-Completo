@@ -1,0 +1,19 @@
+- Implementação (Fases 6 e 7):
+
+O programa implementa todas as características solicitadas.
+
+- Como Executar:
+
+Para executar a máquina virtual, é necessário baixar os arquivos .java disponibilizados e abri-los em seu IDE ou editor de texto preferido.
+Após isso, execute o arquivo MySystem.java. Com isso feito, um menu de ações possíveis da thread Shell será apresentado no terminal.
+
+- Observações 
+
+OBS: Uma limitação do sistema implementado é o fato de que não existe uma maneira prática de descobrir se o input que será digitado
+está sendo computado para o scanner do Shell ou do Console (threads concorrentes), sendo necessário olhar pelos últimos prints no terminal
+qual dessas threads solicitou o input do usuário antes.
+
+OBS: Se não há processos na fila de prontos e o usuário digita o valor de IO solicitado pela thread Console, será necessário criar um outro processo
+para que o processo que havia solicitado IO possa continuar sua execução. Isso porque o novo processo criado será colocado na CPU através do Dispatcher e
+logo interrompido por uma interrupção de término de IO (a CPU já tinha sido avisada que um processo havia terminado IO, porém estava bloqueada). Dessa forma, 
+o processo que havia pedido IO é colocado na CPU e continua sua execução.
