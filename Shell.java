@@ -22,10 +22,12 @@ public class Shell extends Thread {
                 "\n[5] - PC (Bubblesort)" +
                 "\n[6] - Test In" +
                 "\n[7] - Test Out" +
-                "\n[x;y;z;...] - Criar mais de 1 processo por vez (Exemplo: 6;4;5)" +
                 "\n\n= Opções extras =\n" +
                 "\n[dump] - Dump da memória" +
-                "\n\nDigite uma das opções mostradas:";
+                "\n\n = Múltiplos comandos =\n\n" +
+                "Você pode executar vários comandos de uma vez usando o separador ';'" +
+                "\n\nExemplo: 4;dump;3" +
+                "\nEfeito: Cria um processo [4 - PB], realiza o dump da memória, cria um processo [5 - PC]";
         System.out.println(menu);
         while (true) {
             System.out.println("\n[AVISO: Shell está esperando input do usuário]\n");
