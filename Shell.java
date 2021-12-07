@@ -15,14 +15,13 @@ public class Shell extends Thread {
     public void run() {
         String menu = "===== MENU =====\n" +
                 "\n= Criar um processo =\n" +
-                "\n[1] - ProgMinimo" +
-                "\n[2] - Fibonacci10" +
-                "\n[3] - Fatorial" +
-                "\n[4] - PA (Fibonacci)" +
-                "\n[5] - PB (Fatorial)" +
-                "\n[6] - PC (Bubblesort)" +
-                "\n[7] - Test In" +
-                "\n[8] - Test Out" +
+                "\n[1] - Fibonacci10" +
+                "\n[2] - Fatorial" +
+                "\n[3] - PA (Fibonacci)" +
+                "\n[4] - PB (Fatorial)" +
+                "\n[5] - PC (Bubblesort)" +
+                "\n[6] - Test In" +
+                "\n[7] - Test Out" +
                 "\n[x;y;z;...] - Criar mais de 1 processo por vez (Exemplo: 6;4;5)" +
                 "\n\n= Opções extras =\n" +
                 "\n[dump] - Dump da memória" +
@@ -36,27 +35,24 @@ public class Shell extends Thread {
             for (String process : processes) {
                 switch (process) {
                     case "1":
-                        processManager.createProcess(Programs.progMinimo);
-                        break;
-                    case "2":
                         processManager.createProcess(Programs.fibonacci10);
                         break;
-                    case "3":
+                    case "2":
                         processManager.createProcess(Programs.fatorial);
                         break;
-                    case "4":
+                    case "3":
                         processManager.createProcess(Programs.pa);
                         break;
-                    case "5":
+                    case "4":
                         processManager.createProcess(Programs.pb);
                         break;
-                    case "6":
+                    case "5":
                         processManager.createProcess(Programs.pc);
                         break;
-                    case "7":
+                    case "6":
                         processManager.createProcess(Programs.testIn);
                         break;
-                    case "8":
+                    case "7":
                         processManager.createProcess(Programs.testOut);
                         break;
                     case "dump":

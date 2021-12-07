@@ -24,7 +24,7 @@ public class ProcessManager {
 
         if (tablePage == null) {
             System.out.println("Não foi possível criar um processo para o programa " + program.getName()
-                    + " pois não há espaço o suficiente na memória.");
+                    + " pois não há espaço suficiente na memória.");
             return;
         }
 
