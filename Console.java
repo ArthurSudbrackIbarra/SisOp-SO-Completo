@@ -44,8 +44,17 @@ public class Console extends Thread {
         System.out.println(
                 "\n\nSe não houver nenhum processo na lista de prontos a ser executado, crie outro processo, " +
                         "o qual será interrompido por uma interrupção de finalização de IO, para dar sequência ao processo que pediu IO.\n");
-        int input = Integer.parseInt(reader.nextLine());
+
+        String inputAsString = reader.nextLine();
         System.out.println("\nConsole recebeu o input do usuário [OK]\n");
+        int input;
+        try {
+            input = Integer.parseInt(inputAsString);
+        } catch (NumberFormatException error) {
+            System.out
+                    .println("\n[Console] O valor de IO digitado não é um número, será usado o valor -1 neste caso.\n");
+            input = -1;
+        }
         process.setIOValue(input);
         addFinishedIOProcessId(process.getId());
         removeIORequest(process.getId());
